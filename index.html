@@ -16,110 +16,51 @@
         }
 
         .sidebar {
-            width: 220px;
-            min-width: 220px;
+            width: 200px;
+            min-width: 200px;
             background: #1a1f2e;
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
 
-        .sidebar-settings {
+        .sidebar-home {
             padding: 12px 10px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
-        .sidebar-settings h3 {
-            color: rgba(255,255,255,0.4);
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            padding: 0 4px;
-        }
-
-        .setting-group {
-            margin-bottom: 8px;
-        }
-
-        .setting-label {
-            color: rgba(255,255,255,0.5);
-            font-size: 11px;
-            margin-bottom: 3px;
-            padding: 0 4px;
-        }
-
-        .setting-input {
-            width: 100%;
-            padding: 5px 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px;
-            background: rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.85);
-            font-size: 12px;
-            font-family: inherit;
-        }
-
-        .setting-input::placeholder { color: rgba(255,255,255,0.25); }
-        .setting-input:focus { outline: none; border-color: rgba(59,130,246,0.5); }
-
-        .setting-file-label {
-            display: block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.55);
-            font-size: 11px;
-            cursor: pointer;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.15s;
-        }
-
-        .setting-file-label:hover {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.8);
-        }
-
-        .setting-file-label input { display: none; }
-
-        .setting-status {
-            font-size: 10px;
-            color: #34d399;
-            padding: 2px 4px;
-            margin-top: 2px;
-        }
-
-        .setting-btn-row {
+        .home-btn {
             display: flex;
-            gap: 4px;
-        }
-
-        .setting-btn-row .setting-file-label { flex: 1; }
-
-        .setting-btn-clear {
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: rgba(239,68,68,0.15);
-            color: rgba(239,68,68,0.7);
-            font-size: 11px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            background: none;
             cursor: pointer;
-            border: 1px solid rgba(239,68,68,0.2);
-            font-family: inherit;
             transition: all 0.15s;
         }
 
-        .setting-btn-clear:hover {
-            background: rgba(239,68,68,0.25);
-            color: rgba(239,68,68,0.9);
+        .home-btn img {
+            max-width: 100%;
+            max-height: 50px;
+            display: block;
         }
 
-        .logo-preview-small {
-            max-width: 100%;
-            max-height: 40px;
-            margin-top: 4px;
-            border-radius: 3px;
-            display: block;
+        .home-btn .home-text {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .home-btn:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .home-btn.active {
+            background: rgba(59,130,246,0.15);
         }
 
         .sidebar-nav {
@@ -190,52 +131,154 @@
             border: none;
         }
 
-        .welcome {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Home/settings page */
+        .home-page {
             height: 100%;
+            overflow-y: auto;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .home-page h1 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+
+        .home-page .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+            max-width: 750px;
+            margin-bottom: 30px;
+        }
+
+        .setting-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .setting-card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+
+        .setting-card p {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .setting-card input[type="email"],
+        .setting-card input[type="text"] {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid #d0d5dd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .setting-card input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.12);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-load {
+            flex: 1;
+            padding: 7px 12px;
+            border-radius: 6px;
+            border: 1px solid #d0d5dd;
+            background: white;
+            color: #374151;
+            font-size: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
             text-align: center;
-            color: #9ca3af;
-            font-size: 0.95rem;
+        }
+
+        .btn-load:hover { background: #f9fafb; border-color: #3b82f6; color: #3b82f6; }
+
+        .btn-clear {
+            padding: 7px 12px;
+            border-radius: 6px;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-clear:hover { background: #fee2e2; }
+
+        .setting-status {
+            font-size: 11px;
+            color: #16a34a;
+            margin-top: 6px;
+        }
+
+        .logo-preview-img {
+            max-width: 100%;
+            max-height: 50px;
+            margin-top: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 4px;
+            background: white;
+        }
+
+        .home-info {
+            width: 100%;
+            max-width: 750px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px 24px;
+        }
+
+        .home-info h3 {
+            font-size: 14px;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        .home-info ol {
+            padding-left: 20px;
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.7;
         }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <div class="sidebar-settings">
-            <h3>Inställningar</h3>
-
-            <div class="setting-group">
-                <div class="setting-label">Mailadress för resultat</div>
-                <input type="email" class="setting-input" id="emailSetting" placeholder="namn@example.com" onchange="saveSettings()">
-            </div>
-
-            <div class="setting-group">
-                <div class="setting-label">Logotyp (PDF-header)</div>
-                <div class="setting-btn-row">
-                    <label class="setting-file-label">
-                        Ladda
-                        <input type="file" accept="image/png,image/jpeg,image/jpg" onchange="loadLogo(this)">
-                    </label>
-                    <button class="setting-btn-clear" onclick="clearLogo()">Rensa</button>
-                </div>
-                <div class="setting-status" id="logoStatus"></div>
-                <div id="logoPreview"></div>
-            </div>
-
-            <div class="setting-group">
-                <div class="setting-label">Medlemslista (CSV)</div>
-                <div class="setting-btn-row">
-                    <label class="setting-file-label">
-                        Ladda
-                        <input type="file" accept=".csv,.txt" onchange="loadMembers(this)">
-                    </label>
-                    <button class="setting-btn-clear" onclick="clearMembers()">Rensa</button>
-                </div>
-                <div class="setting-status" id="membersStatus"></div>
-            </div>
+        <div class="sidebar-home">
+            <button class="home-btn active" id="homeBtn" onclick="showHome()">
+                <span class="home-text" id="homeBtnText">Resultatmallar</span>
+            </button>
         </div>
 
         <div class="sidebar-nav">
@@ -258,22 +301,81 @@
         </div>
     </nav>
 
-    <main class="main" id="mainContent">
-        <div class="welcome">Välj en tävlingsform i menyn</div>
-    </main>
+    <main class="main" id="mainContent"></main>
 
     <script>
+        const homeHTML = `
+        <div class="home-page">
+            <h1>Resultatmallar</h1>
+            <p class="subtitle">Konfigurera gemensamma inställningar nedan, välj sedan tävlingsform i menyn.</p>
+
+            <div class="settings-grid">
+                <div class="setting-card">
+                    <h3>Mailadress</h3>
+                    <p>Mottagare vid "Skicka resultat"</p>
+                    <input type="email" id="emailSetting" placeholder="namn@example.com" onchange="saveEmail()">
+                </div>
+
+                <div class="setting-card">
+                    <h3>Logotyp</h3>
+                    <p>Visas i PDF-header (valfritt)</p>
+                    <div class="btn-row">
+                        <label class="btn-load">
+                            Ladda bild
+                            <input type="file" accept="image/png,image/jpeg,image/jpg" onchange="loadLogo(this)" style="display:none">
+                        </label>
+                        <button class="btn-clear" onclick="clearLogo()">Rensa</button>
+                    </div>
+                    <div class="setting-status" id="logoStatus"></div>
+                    <div id="logoPreview"></div>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Medlemslista</h3>
+                    <p>CSV-fil med namn för snabbval</p>
+                    <div class="btn-row">
+                        <label class="btn-load">
+                            Ladda CSV
+                            <input type="file" accept=".csv,.txt" onchange="loadMembers(this)" style="display:none">
+                        </label>
+                        <button class="btn-clear" onclick="clearMembers()">Rensa</button>
+                    </div>
+                    <div class="setting-status" id="membersStatus"></div>
+                </div>
+            </div>
+
+            <div class="home-info">
+                <h3>Så här gör du</h3>
+                <ol>
+                    <li>Ställ in mailadress, logotyp och medlemslista ovan (sparas automatiskt).</li>
+                    <li>Välj tävlingsform i menyn till vänster.</li>
+                    <li>Fyll i skyttarnas namn och resultat. Namn föreslås automatiskt från medlemslistan.</li>
+                    <li>Använd "Skapa PDF" för att generera en snygg resultatrapport.</li>
+                    <li>Använd "Skicka resultat" för att ladda ner CSV + PDF och öppna ett mail.</li>
+                    <li>"Spara CSV" sparar en kopia som kan laddas upp igen med "Ladda CSV" om du behöver redigera.</li>
+                </ol>
+            </div>
+        </div>`;
+
+        function showHome() {
+            document.getElementById('mainContent').innerHTML = homeHTML;
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('homeBtn').classList.add('active');
+            restoreHomeState();
+        }
+
         function loadPage(name) {
             const main = document.getElementById('mainContent');
             main.innerHTML = '<iframe src="' + name + '.html?v=' + Date.now() + '"></iframe>';
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.page === name);
             });
+            document.getElementById('homeBtn').classList.remove('active');
         }
 
-        function saveSettings() {
-            const email = document.getElementById('emailSetting').value;
-            localStorage.setItem('resultEmail', email);
+        function saveEmail() {
+            const el = document.getElementById('emailSetting');
+            if (el) localStorage.setItem('resultEmail', el.value);
         }
 
         function loadLogo(input) {
@@ -281,23 +383,29 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 localStorage.setItem('customLogo', e.target.result);
-                showLogoStatus();
+                updateLogoDisplay();
             };
             reader.readAsDataURL(input.files[0]);
         }
 
         function clearLogo() {
             localStorage.removeItem('customLogo');
-            document.getElementById('logoStatus').textContent = '';
-            document.getElementById('logoPreview').innerHTML = '';
+            updateLogoDisplay();
         }
 
-        function showLogoStatus() {
+        function updateLogoDisplay() {
             const logo = localStorage.getItem('customLogo');
+            const status = document.getElementById('logoStatus');
+            const preview = document.getElementById('logoPreview');
+            if (!status || !preview) return;
             if (logo) {
-                document.getElementById('logoStatus').textContent = 'Logotyp laddad';
-                document.getElementById('logoPreview').innerHTML = '<img class="logo-preview-small" src="' + logo + '">';
+                status.textContent = 'Logotyp laddad';
+                preview.innerHTML = '<img class="logo-preview-img" src="' + logo + '">';
+            } else {
+                status.textContent = '';
+                preview.innerHTML = '';
             }
+            updateHomeButton();
         }
 
         function loadMembers(input) {
@@ -308,29 +416,49 @@
                 const content = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
                 const lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
                 localStorage.setItem('membersList', JSON.stringify(lines));
-                document.getElementById('membersStatus').textContent = lines.length + ' medlemmar laddade';
+                const el = document.getElementById('membersStatus');
+                if (el) el.textContent = lines.length + ' medlemmar laddade';
             };
             reader.readAsText(input.files[0]);
         }
 
         function clearMembers() {
             localStorage.removeItem('membersList');
-            document.getElementById('membersStatus').textContent = '';
+            const el = document.getElementById('membersStatus');
+            if (el) el.textContent = '';
         }
 
-        // Restore on load
-        (function() {
+        function updateHomeButton() {
+            const logo = localStorage.getItem('customLogo');
+            const btn = document.getElementById('homeBtn');
+            const text = document.getElementById('homeBtnText');
+            if (logo) {
+                btn.innerHTML = '<img src="' + logo + '" style="max-width:100%;max-height:50px;">';
+            } else {
+                btn.innerHTML = '<span class="home-text">Resultatmallar</span>';
+            }
+        }
+
+        function restoreHomeState() {
             const email = localStorage.getItem('resultEmail');
-            if (email) document.getElementById('emailSetting').value = email;
-            showLogoStatus();
+            const emailEl = document.getElementById('emailSetting');
+            if (email && emailEl) emailEl.value = email;
+
+            updateLogoDisplay();
+
             const members = localStorage.getItem('membersList');
-            if (members) {
+            const membersEl = document.getElementById('membersStatus');
+            if (members && membersEl) {
                 try {
                     const list = JSON.parse(members);
-                    document.getElementById('membersStatus').textContent = list.length + ' medlemmar laddade';
+                    membersEl.textContent = list.length + ' medlemmar laddade';
                 } catch(e) {}
             }
-        })();
+        }
+
+        // Init
+        updateHomeButton();
+        showHome();
     </script>
 
 </body>
