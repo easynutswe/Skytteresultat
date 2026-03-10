@@ -190,8 +190,7 @@
         <p>1. Filerna har sparats i din Downloads-mapp:</p>
         <p>&nbsp;&nbsp;&nbsp;• "[tävlingsnamn]_[datum].csv"</p>
         <p>&nbsp;&nbsp;&nbsp;• "[tävlingsnamn]_[datum].pdf"</p>
-        <p>2. Ett mail till styrelsen@uvpsk.se kommer att öppnas</p>
-        <p>3. Bifoga BÅDA filerna (.csv och .pdf) till mailet innan du skickar</p>
+        <p>2. Skicka BÅDA filerna (.csv och .pdf) till styrelsen</p>
         <button onclick="closeModal()">OK</button>
     </div>
     <div class="modal-backdrop" onclick="closeModal()"></div>
@@ -276,6 +275,7 @@
             reader.onload = function(e) {
                 try {
                     customLogoDataUrl = e.target.result;
+                    try { localStorage.setItem('customLogo', customLogoDataUrl); } catch(e) {}
                     statusSpan.textContent = '(Logotyp laddad)';
                     statusSpan.style.color = 'green';
                 } catch (error) {
@@ -1015,9 +1015,6 @@
             document.getElementById('submitModal').style.display = 'block';
             document.querySelector('.modal-backdrop').style.display = 'block';
             
-            setTimeout(() => {
-                window.location.href = `mailto:styrelsen@uvpsk.se?subject=${emailSubject}&body=${emailBody}`;
-            }, 1000);
         }
 
         function closeModal() {
@@ -1104,7 +1101,8 @@
             if (customLogoDataUrl) {
                 img.src = customLogoDataUrl;
             } else {
-                img.src = 'https://www.uvpsk.se/wp-content/uploads/2025/09/Logo.jpg';
+                img.onerror();
+                return;
             }
         }
 
@@ -1383,6 +1381,7 @@
         document.addEventListener('input', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
         document.addEventListener('change', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
         setTimeout(() => { autoRestore(); }, 100);
+        if (!customLogoDataUrl) { const savedLogo = localStorage.getItem('customLogo'); if (savedLogo) { customLogoDataUrl = savedLogo; document.getElementById('logoStatus').textContent = '(Logotyp laddad)'; } }
 
     </script>
     <div class="autosave-status" id="saveStatus">Sparad</div>

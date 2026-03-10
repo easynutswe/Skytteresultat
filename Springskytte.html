@@ -7,8 +7,7 @@
     <div id="submitModal">
         <h3>Skicka resultat</h3>
         <p>1. Filerna har sparats i din Downloads-mapp</p>
-        <p>2. Ett mail till styrelsen@uvpsk.se kommer att öppnas</p>
-        <p>3. Bifoga filerna till mailet innan du skickar</p>
+        <p>2. Skicka filerna till ansvarig</p>
         <button class="btn-primary" onclick="closeModal()">OK</button>
     </div>
     <div class="modal-backdrop" onclick="closeModal()"></div>
@@ -195,8 +194,7 @@
     <div id="submitModal">
         <h3>Skicka resultat</h3>
         <p>1. Filerna har sparats i din Downloads-mapp</p>
-        <p>2. Ett mail till styrelsen@uvpsk.se kommer att öppnas</p>
-        <p>3. Bifoga filerna till mailet innan du skickar</p>
+        <p>2. Skicka filerna till ansvarig</p>
         <button class="btn-primary" onclick="closeModal()">OK</button>
     </div>
     <div class="modal-backdrop" onclick="closeModal()"></div>
@@ -223,7 +221,8 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     customLogoDataUrl = e.target.result;
-                    
+                    try { localStorage.setItem('customLogo', customLogoDataUrl); } catch(e) {}
+
                     const previewContainer = document.getElementById('logoPreviewContainer');
                     previewContainer.innerHTML = '<img src="' + customLogoDataUrl + '" class="logo-preview" alt="Logo Preview">';
                     
@@ -658,7 +657,8 @@
             if (customLogoDataUrl) {
                 img.src = customLogoDataUrl;
             } else {
-                img.src = 'https://www.uvpsk.se/wp-content/uploads/2025/09/Logo.jpg';
+                img.onerror();
+                return;
             }
         }
 
@@ -901,7 +901,6 @@
             const d = document.getElementById('date').value;
             document.getElementById('submitModal').style.display = 'block';
             document.querySelector('.modal-backdrop').style.display = 'block';
-            setTimeout(() => { window.location.href = 'mailto:styrelsen@uvpsk.se?subject=' + encodeURIComponent('UVPSK resultat ' + t + ' ' + d) + '&body=' + encodeURIComponent('Hej!\n\nBifogat finns resultaten.\n\nMvh'); }, 1000);
         }
         function closeModal() {
             document.getElementById('submitModal').style.display = 'none';
@@ -970,7 +969,7 @@
         }
         document.addEventListener('input', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
         document.addEventListener('change', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
-        setTimeout(() => { autoRestore(); }, 100);
+        setTimeout(() => { autoRestore(); if (!customLogoDataUrl) { const savedLogo = localStorage.getItem('customLogo'); if (savedLogo) { customLogoDataUrl = savedLogo; document.getElementById('logoStatus').textContent = '(Logotyp laddad)'; } } }, 100);
 
     </script>
     <div class="autosave-status" id="saveStatus">Sparad</div>
