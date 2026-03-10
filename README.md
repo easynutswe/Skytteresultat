@@ -46,7 +46,7 @@ Ladda upp en valfri PNG- eller JPEG-bild som visas i övre vänstra hörnet på 
 - [jsPDF](https://github.com/parallax/jsPDF) för PDF-generering
 - Web Crypto API (AES-256-GCM) för valfri kryptering
 - `localStorage` för att spara inställningar mellan sessioner
-- Cache-busting så att senaste versionen alltid laddas via iframe
+- Versionshanterad cache – undersidor laddas om först när versionen uppdateras
 
 ## Licens
 
