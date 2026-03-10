@@ -20,7 +20,7 @@
         .instructions { background-color: #f8f9fb; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e8ecf0; }
         .instructions h3 { margin: 0 0 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 600; }
         .instructions p { margin: 4px 0; line-height: 1.5; font-size: 13px; color: #4a5568; }
-        .setup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .setup-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 20px; }
         .setup-box { background-color: #f0f7ff; padding: 14px 16px; border-radius: 8px; border: 1px solid #c7ddf5; }
         .setup-box h4 { margin: 0 0 6px 0; color: #1a5276; font-size: 13px; font-weight: 600; }
         .setup-box p { margin: 0 0 6px 0; font-size: 12px; color: #5a6778; }
@@ -81,9 +81,13 @@
         .groups-input { width: 200px; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 13px; font-family: inherit; text-align: left; }
         .groups-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
         .score-input { width: 40px; }
-        .sar-checkboxes { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
-        .sar-checkboxes label { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; cursor: pointer; margin: 0; }
-        .sar-checkboxes input[type="checkbox"] { width: auto; cursor: pointer; }
+        .station-config-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 6px; }
+        .station-config-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; background: white; border-radius: 6px; border: 1px solid #e8ecf0; }
+        .station-config-item .stn-label { font-size: 12px; font-weight: 600; color: #1a5276; }
+        .station-config-item .mal-row { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #5a6778; }
+        .station-config-item .mal-row input[type="number"] { width: 36px; padding: 3px 2px; font-size: 12px; text-align: center; border: 1px solid #d0d5dd; border-radius: 4px; }
+        .station-config-item .sar-row { display: flex; align-items: center; gap: 3px; font-size: 11px; color: #5a6778; }
+        .station-config-item .sar-row input[type="checkbox"] { width: auto; cursor: pointer; margin: 0; }
         @media (max-width: 900px) { .setup-row { grid-template-columns: 1fr; } }
 
     </style>
@@ -94,10 +98,10 @@
 
         <div class="instructions">
             <h3>Instruktioner</h3>
-            <p>1. Välj vilka stationer som har särskiljningskolumn (S) genom att kryssa i rutorna nedan</p>
+            <p>1. Ställ in antal mål per station och kryssa i vilka stationer som har särskiljning (S)</p>
             <p>2. Ange vapengrupper som kommaseparerade värden (standard: A,C,R)</p>
             <p>3. Fyll i tävlingsnamn, datum och skjutledare</p>
-            <p>4. Lägg till rader och fyll i namn, grupp och stationsvärden (T = Träff, F = Figur, S = Särskiljning)</p>
+            <p>4. Lägg till rader och fyll i namn, grupp och stationsvärden (T = Träff, M = Mål, S = Särskiljning)</p>
             <p>5. Tryck "Beräkna &amp; Sortera" för att summera och sortera efter grupp/poäng</p>
             <p>6. Använd "Skicka resultat" för att spara CSV + PDF och förbereda mail</p>
             <p>7. Spara gärna en digital kopia (Spara CSV) som du kan ladda upp (Ladda CSV) för att editera om du fyllt i något resultat fel och skicka in på nytt.</p>
@@ -107,15 +111,39 @@
 
         <div class="setup-row">
             <div class="setup-box setup-box--neutral">
-                <h4>Särskiljning per station</h4>
-                <p>Kryssa i vilka stationer som har särskiljningskolumn (S)</p>
-                <div class="sar-checkboxes">
-                    <label><input type="checkbox" id="sarStn1" onchange="onSarConfigChange()"> Stn 1</label>
-                    <label><input type="checkbox" id="sarStn2" onchange="onSarConfigChange()"> Stn 2</label>
-                    <label><input type="checkbox" id="sarStn3" onchange="onSarConfigChange()"> Stn 3</label>
-                    <label><input type="checkbox" id="sarStn4" onchange="onSarConfigChange()"> Stn 4</label>
-                    <label><input type="checkbox" id="sarStn5" onchange="onSarConfigChange()"> Stn 5</label>
-                    <label><input type="checkbox" id="sarStn6" onchange="onSarConfigChange()"> Stn 6</label>
+                <h4>Stationsinställningar</h4>
+                <p>Ange max antal mål per station (max träff är alltid 6). Kryssa i stationer med särskiljning.</p>
+                <div class="station-config-grid">
+                    <div class="station-config-item">
+                        <span class="stn-label">Stn 1</span>
+                        <div class="mal-row">Mål <input type="number" id="maxMal1" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="sar-row"><input type="checkbox" id="sarStn1" onchange="onStationConfigChange()"> Sär</div>
+                    </div>
+                    <div class="station-config-item">
+                        <span class="stn-label">Stn 2</span>
+                        <div class="mal-row">Mål <input type="number" id="maxMal2" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="sar-row"><input type="checkbox" id="sarStn2" onchange="onStationConfigChange()"> Sär</div>
+                    </div>
+                    <div class="station-config-item">
+                        <span class="stn-label">Stn 3</span>
+                        <div class="mal-row">Mål <input type="number" id="maxMal3" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="sar-row"><input type="checkbox" id="sarStn3" onchange="onStationConfigChange()"> Sär</div>
+                    </div>
+                    <div class="station-config-item">
+                        <span class="stn-label">Stn 4</span>
+                        <div class="mal-row">Mål <input type="number" id="maxMal4" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="sar-row"><input type="checkbox" id="sarStn4" onchange="onStationConfigChange()"> Sär</div>
+                    </div>
+                    <div class="station-config-item">
+                        <span class="stn-label">Stn 5</span>
+                        <div class="mal-row">Mål <input type="number" id="maxMal5" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="sar-row"><input type="checkbox" id="sarStn5" onchange="onStationConfigChange()"> Sär</div>
+                    </div>
+                    <div class="station-config-item">
+                        <span class="stn-label">Stn 6</span>
+                        <div class="mal-row">Mål <input type="number" id="maxMal6" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="sar-row"><input type="checkbox" id="sarStn6" onchange="onStationConfigChange()"> Sär</div>
+                    </div>
                 </div>
             </div>
             <div class="setup-box">
@@ -186,16 +214,25 @@
         let preloadedMembers = [];
         let customLogoDataUrl = null;
 
+        function getMaxMal(stationIndex) {
+            const val = parseInt(document.getElementById('maxMal' + (stationIndex + 1)).value);
+            return (val >= 1 && val <= 6) ? val : 6;
+        }
+
+        function getMaxMalAll() {
+            const result = [];
+            for (let i = 0; i < NUM_STATIONS; i++) {
+                result.push(getMaxMal(i));
+            }
+            return result;
+        }
+
         function getSarStations() {
             const result = [];
             for (let i = 1; i <= NUM_STATIONS; i++) {
                 result.push(document.getElementById('sarStn' + i).checked);
             }
             return result;
-        }
-
-        function hasSar(stationIndex) {
-            return document.getElementById('sarStn' + (stationIndex + 1)).checked;
         }
 
         function anySar() {
@@ -422,7 +459,16 @@
             }
         }
 
-        function onSarConfigChange() {
+        function onStationConfigChange() {
+            // Clamp max mål inputs to 1-6
+            for (let i = 1; i <= NUM_STATIONS; i++) {
+                const el = document.getElementById('maxMal' + i);
+                let v = parseInt(el.value);
+                if (isNaN(v) || v < 1) v = 1;
+                if (v > 6) v = 6;
+                el.value = v;
+            }
+
             // Save current row data, rebuild table, restore data
             const tbody = document.getElementById('resultsBody');
             const rows = Array.from(tbody.rows);
@@ -430,13 +476,13 @@
                 const name = row.querySelector('.name') ? row.querySelector('.name').value : '';
                 const group = row.querySelector('.group') ? row.querySelector('.group').value : '';
                 const tInputs = Array.from(row.querySelectorAll('.stn-t'));
-                const fInputs = Array.from(row.querySelectorAll('.stn-f'));
+                const mInputs = Array.from(row.querySelectorAll('.stn-m'));
                 const sInputs = Array.from(row.querySelectorAll('.stn-s'));
                 const stations = [];
                 for (let s = 0; s < NUM_STATIONS; s++) {
                     stations.push({
                         t: tInputs[s] ? tInputs[s].value : '',
-                        f: fInputs[s] ? fInputs[s].value : '',
+                        m: mInputs[s] ? mInputs[s].value : '',
                         s: sInputs[s] ? sInputs[s].value : ''
                     });
                 }
@@ -462,11 +508,17 @@
                     groupSel.value = data.group;
                 }
                 const tInputs = row.querySelectorAll('.stn-t');
-                const fInputs = row.querySelectorAll('.stn-f');
+                const mInputs = row.querySelectorAll('.stn-m');
                 const sInputs = row.querySelectorAll('.stn-s');
                 for (let s = 0; s < NUM_STATIONS; s++) {
                     if (tInputs[s]) tInputs[s].value = data.stations[s].t;
-                    if (fInputs[s]) fInputs[s].value = data.stations[s].f;
+                    if (mInputs[s]) {
+                        // Clamp restored mål value to new max
+                        let mVal = parseInt(data.stations[s].m) || 0;
+                        const maxM = getMaxMal(s);
+                        if (mVal > maxM) mVal = maxM;
+                        mInputs[s].value = mVal || data.stations[s].m;
+                    }
                     if (sInputs[s]) sInputs[s].value = data.stations[s].s;
                 }
                 updateTotals(row);
@@ -477,16 +529,17 @@
             const headerTop = document.getElementById('tableHeaderTop');
             const headerSub = document.getElementById('tableHeaderSub');
             const sarStations = getSarStations();
+            const maxMals = getMaxMalAll();
 
             let topHtml = '<th rowspan="2" style="min-width: 200px;">Namn</th>';
             topHtml += '<th rowspan="2" style="min-width: 80px;">Grupp</th>';
             for (let i = 0; i < NUM_STATIONS; i++) {
                 const cols = sarStations[i] ? 3 : 2;
                 const cls = sarStations[i] ? 'station-header-sar' : 'station-header';
-                topHtml += `<th colspan="${cols}" class="${cls}">Stn ${i + 1}</th>`;
+                topHtml += `<th colspan="${cols}" class="${cls}">Stn ${i + 1} (${maxMals[i]})</th>`;
             }
             topHtml += '<th rowspan="2" class="total-col">Träff</th>';
-            topHtml += '<th rowspan="2" class="total-col">Figur</th>';
+            topHtml += '<th rowspan="2" class="total-col">Mål</th>';
             topHtml += '<th rowspan="2" class="total-col">Poäng</th>';
             if (anySar()) {
                 topHtml += '<th rowspan="2" class="summary-col">Särp</th>';
@@ -495,7 +548,7 @@
 
             let subHtml = '';
             for (let i = 0; i < NUM_STATIONS; i++) {
-                subHtml += '<th>T</th><th>F</th>';
+                subHtml += '<th>T</th><th>M</th>';
                 if (sarStations[i]) {
                     subHtml += '<th>S</th>';
                 }
@@ -503,21 +556,23 @@
             headerSub.innerHTML = subHtml;
         }
 
-        function createScoreInput(className) {
+        function createScoreInput(className, maxVal) {
             const input = document.createElement('input');
             input.type = 'number';
             input.min = '0';
-            input.max = '6';
+            input.max = String(maxVal);
             input.className = className + ' score-input';
             input.placeholder = '0';
             input.style.width = '40px';
+            input.dataset.maxVal = maxVal;
             input.oninput = (e) => {
                 e.target.value = e.target.value.replace(/[^0-9]/g, '');
                 if (e.target.value.length > 1) {
                     e.target.value = e.target.value.slice(0, 1);
                 }
-                if (e.target.value !== '' && parseInt(e.target.value) > 6) {
-                    e.target.value = '6';
+                const max = parseInt(e.target.dataset.maxVal) || 6;
+                if (e.target.value !== '' && parseInt(e.target.value) > max) {
+                    e.target.value = String(max);
                 }
                 updateTotals(e.target.closest('tr'));
             };
@@ -574,18 +629,19 @@
 
             // Station inputs
             for (let s = 0; s < NUM_STATIONS; s++) {
-                // Träff
+                const maxM = getMaxMal(s);
+                // Träff (always max 6)
                 const tTd = document.createElement('td');
-                tTd.appendChild(createScoreInput('stn-t'));
+                tTd.appendChild(createScoreInput('stn-t', 6));
                 row.appendChild(tTd);
-                // Figur
-                const fTd = document.createElement('td');
-                fTd.appendChild(createScoreInput('stn-f'));
-                row.appendChild(fTd);
-                // Särskiljning (only if enabled for this station)
+                // Mål (max per station config)
+                const mTd = document.createElement('td');
+                mTd.appendChild(createScoreInput('stn-m', maxM));
+                row.appendChild(mTd);
+                // Särskiljning (only if enabled, max 6)
                 if (sarStations[s]) {
                     const sTd = document.createElement('td');
-                    sTd.appendChild(createScoreInput('stn-s'));
+                    sTd.appendChild(createScoreInput('stn-s', 6));
                     row.appendChild(sTd);
                 }
             }
@@ -596,13 +652,13 @@
             totTTd.textContent = '0';
             row.appendChild(totTTd);
 
-            // Figur total
-            const totFTd = document.createElement('td');
-            totFTd.className = 'total-figur total-col';
-            totFTd.textContent = '0';
-            row.appendChild(totFTd);
+            // Mål total
+            const totMTd = document.createElement('td');
+            totMTd.className = 'total-mal total-col';
+            totMTd.textContent = '0';
+            row.appendChild(totMTd);
 
-            // Poäng (Träff + Figur)
+            // Poäng (Träff + Mål)
             const poangTd = document.createElement('td');
             poangTd.className = 'total-poang total-col';
             poangTd.textContent = '0';
@@ -646,20 +702,20 @@
             if (!row) return;
 
             const tInputs = row.querySelectorAll('.stn-t');
-            const fInputs = row.querySelectorAll('.stn-f');
+            const mInputs = row.querySelectorAll('.stn-m');
             const sInputs = row.querySelectorAll('.stn-s');
-            let totalT = 0, totalF = 0, totalS = 0;
+            let totalT = 0, totalM = 0, totalS = 0;
             tInputs.forEach(inp => { totalT += parseInt(inp.value) || 0; });
-            fInputs.forEach(inp => { totalF += parseInt(inp.value) || 0; });
+            mInputs.forEach(inp => { totalM += parseInt(inp.value) || 0; });
             sInputs.forEach(inp => { totalS += parseInt(inp.value) || 0; });
 
             const totTCell = row.querySelector('.total-traff');
-            const totFCell = row.querySelector('.total-figur');
+            const totMCell = row.querySelector('.total-mal');
             const poangCell = row.querySelector('.total-poang');
             const sarpCell = row.querySelector('.total-sarp');
             if (totTCell) totTCell.textContent = totalT;
-            if (totFCell) totFCell.textContent = totalF;
-            if (poangCell) poangCell.textContent = totalT + totalF;
+            if (totMCell) totMCell.textContent = totalM;
+            if (poangCell) poangCell.textContent = totalT + totalM;
             if (sarpCell) sarpCell.textContent = totalS;
         }
 
@@ -698,7 +754,7 @@
             const sarStations = getSarStations();
 
             const tInputs = Array.from(row.querySelectorAll('.stn-t'));
-            const fInputs = Array.from(row.querySelectorAll('.stn-f'));
+            const mInputs = Array.from(row.querySelectorAll('.stn-m'));
             const sInputs = Array.from(row.querySelectorAll('.stn-s'));
 
             let sIdx = 0;
@@ -706,7 +762,7 @@
             for (let s = 0; s < NUM_STATIONS; s++) {
                 const stn = {
                     t: parseInt(tInputs[s] ? tInputs[s].value : 0) || 0,
-                    f: parseInt(fInputs[s] ? fInputs[s].value : 0) || 0,
+                    m: parseInt(mInputs[s] ? mInputs[s].value : 0) || 0,
                     s: 0
                 };
                 if (sarStations[s] && sInputs[sIdx]) {
@@ -716,17 +772,17 @@
                 stations.push(stn);
             }
 
-            let totalT = 0, totalF = 0, totalS = 0;
+            let totalT = 0, totalM = 0, totalS = 0;
             stations.forEach(stn => {
                 totalT += stn.t;
-                totalF += stn.f;
+                totalM += stn.m;
                 totalS += stn.s;
             });
-            const poang = totalT + totalF;
+            const poang = totalT + totalM;
 
             return {
                 name, group, stations,
-                totalT, totalF, poang, totalS,
+                totalT, totalM, poang, totalS,
                 sortValue: poang,
                 sortTie: totalS
             };
@@ -776,19 +832,21 @@
             const groupsConfig = document.getElementById('groupsConfig').value;
             const sarStations = getSarStations();
             const sarConfig = sarStations.map(v => v ? '1' : '0').join(',');
+            const maxMals = getMaxMalAll();
+            const malConfig = maxMals.join(',');
             const rows = Array.from(document.getElementById('resultsBody').getElementsByTagName('tr'));
 
             let csv = '\uFEFF';
-            // Metadata line: title;date;leader;freeText;sarConfig;groupsConfig
-            csv += `${competitionTitle};${date};${leader};${freeText.replace(/\n/g, '\\n')};${sarConfig};${groupsConfig}\n`;
+            // Metadata: title;date;leader;freeText;sarConfig;groupsConfig;malConfig
+            csv += `${competitionTitle};${date};${leader};${freeText.replace(/\n/g, '\\n')};${sarConfig};${groupsConfig};${malConfig}\n`;
 
             rows.forEach(row => {
                 const data = getRowData(row);
                 let line = `${data.name};${data.group}`;
                 data.stations.forEach(stn => {
-                    line += `;${stn.t};${stn.f};${stn.s}`;
+                    line += `;${stn.t};${stn.m};${stn.s}`;
                 });
-                line += `;${data.totalT};${data.totalF};${data.poang};${data.totalS}`;
+                line += `;${data.totalT};${data.totalM};${data.poang};${data.totalS}`;
                 csv += line + '\n';
             });
 
@@ -814,7 +872,7 @@
                 const [metadataLine, ...dataLines] = lines;
 
                 const metaParts = metadataLine.split(';');
-                // Expected: title;date;leader;freeText;sarConfig;groupsConfig
+                // Expected: title;date;leader;freeText;sarConfig;groupsConfig[;malConfig]
                 if (metaParts.length >= 6) {
                     document.getElementById('competitionTitle').value = metaParts[0];
                     document.getElementById('date').value = metaParts[1];
@@ -822,14 +880,12 @@
                     document.getElementById('freeText').value = metaParts[3].replace(/\\n/g, '\n');
 
                     const sarConfig = metaParts[4];
-                    // Check if sarConfig looks like "0,1,0,1,0,0" (new format) or "2"/"3" (old format)
                     if (sarConfig.includes(',')) {
                         const sarValues = sarConfig.split(',');
                         for (let i = 0; i < NUM_STATIONS; i++) {
                             document.getElementById('sarStn' + (i + 1)).checked = sarValues[i] === '1';
                         }
                     } else {
-                        // Legacy: old mode 3 = all stations have S, mode 2 = none
                         const oldMode = parseInt(sarConfig);
                         for (let i = 0; i < NUM_STATIONS; i++) {
                             document.getElementById('sarStn' + (i + 1)).checked = (oldMode === 3);
@@ -837,6 +893,16 @@
                     }
 
                     document.getElementById('groupsConfig').value = metaParts[5];
+
+                    // Restore max mål config if present
+                    if (metaParts.length >= 7) {
+                        const malValues = metaParts[6].split(',');
+                        for (let i = 0; i < NUM_STATIONS; i++) {
+                            const v = parseInt(malValues[i]);
+                            document.getElementById('maxMal' + (i + 1)).value = (v >= 1 && v <= 6) ? v : 6;
+                        }
+                    }
+
                     updateTableHeader();
                 } else if (metaParts.length >= 4) {
                     document.getElementById('competitionTitle').value = metaParts[0];
@@ -870,15 +936,15 @@
                         }
                         groupSel.value = group;
 
-                        // Station data: always 3 values per station (T, F, S)
+                        // Station data: always 3 values per station (T, M, S)
                         const tInputs = row.querySelectorAll('.stn-t');
-                        const fInputs = row.querySelectorAll('.stn-f');
+                        const mInputs = row.querySelectorAll('.stn-m');
                         const sInputs = row.querySelectorAll('.stn-s');
                         let sIdx = 0;
                         for (let s = 0; s < NUM_STATIONS; s++) {
-                            const idx = s * 3 + 2; // offset after name;group
+                            const idx = s * 3 + 2;
                             if (tInputs[s]) tInputs[s].value = parts[idx] || '0';
-                            if (fInputs[s]) fInputs[s].value = parts[idx + 1] || '0';
+                            if (mInputs[s]) mInputs[s].value = parts[idx + 1] || '0';
                             if (sarStations[s] && sInputs[sIdx]) {
                                 sInputs[sIdx].value = parts[idx + 2] || '0';
                                 sIdx++;
@@ -1001,6 +1067,7 @@
         function generatePDFContent(doc, date, leader, title, freeTextContent, rows, startY) {
             let y = startY;
             const sarStations = getSarStations();
+            const maxMals = getMaxMalAll();
             const sarCount = sarStations.filter(v => v).length;
             const hasSarAny = sarCount > 0;
 
@@ -1046,7 +1113,7 @@
             doc.setLineWidth(0.5);
 
             // Build column positions dynamically - Milsnabb-style grouped layout
-            const colW = 9; // width per sub-column (T, F, S)
+            const colW = 9;
             const stnStart = tableX + 78;
 
             const colPos = {
@@ -1058,19 +1125,19 @@
 
             let xPos = stnStart;
             for (let s = 0; s < NUM_STATIONS; s++) {
-                const stn = { start: xPos, t: xPos, f: xPos + colW };
+                const stn = { start: xPos, t: xPos, m: xPos + colW };
                 if (sarStations[s]) {
                     stn.s = xPos + colW * 2;
-                    xPos += colW * 3 + 3; // 3 cols + gap between stations
+                    xPos += colW * 3 + 3;
                 } else {
-                    xPos += colW * 2 + 3; // 2 cols + gap between stations
+                    xPos += colW * 2 + 3;
                 }
                 colPos.stations.push(stn);
             }
 
             xPos += 2;
             colPos.totalT = xPos;
-            colPos.totalF = xPos + 15;
+            colPos.totalM = xPos + 15;
             colPos.poang = xPos + 30;
             if (hasSarAny) {
                 colPos.sarp = xPos + 45;
@@ -1087,13 +1154,13 @@
                 const stn = colPos.stations[s];
                 const stnCols = sarStations[s] ? 3 : 2;
                 const stnWidth = stnCols * colW;
-                const label = `Station ${s + 1}`;
+                const label = `Stn ${s + 1} (${maxMals[s]})`;
                 const labelW = doc.getTextWidth(label);
                 doc.text(label, stn.start + (stnWidth - labelW) / 2, y);
             }
 
             doc.text('Träff', colPos.totalT, y);
-            doc.text('Figur', colPos.totalF, y);
+            doc.text('Mål', colPos.totalM, y);
             doc.text('Poäng', colPos.poang, y);
             if (hasSarAny) {
                 doc.text('Särp', colPos.sarp, y);
@@ -1102,11 +1169,11 @@
             doc.line(tableX, y + 3, tableX + tableW, y + 3);
             y += 8;
 
-            // === HEADER ROW 2: Sub-column labels (T, F, S) ===
+            // === HEADER ROW 2: Sub-column labels (T, M, S) ===
             doc.setFontSize(8);
             for (let s = 0; s < NUM_STATIONS; s++) {
                 doc.text('T', colPos.stations[s].t, y);
-                doc.text('F', colPos.stations[s].f, y);
+                doc.text('M', colPos.stations[s].m, y);
                 if (sarStations[s]) {
                     doc.text('S', colPos.stations[s].s, y);
                 }
@@ -1149,7 +1216,7 @@
                     result.stations.forEach((stn, s) => {
                         doc.setFont('helvetica', 'normal');
                         doc.text(stn.t.toString(), colPos.stations[s].t, y);
-                        doc.text(stn.f.toString(), colPos.stations[s].f, y);
+                        doc.text(stn.m.toString(), colPos.stations[s].m, y);
                         if (sarStations[s]) {
                             doc.text(stn.s.toString(), colPos.stations[s].s, y);
                         }
@@ -1157,7 +1224,7 @@
 
                     doc.setFont('helvetica', 'bold');
                     doc.text(result.totalT.toString(), colPos.totalT, y);
-                    doc.text(result.totalF.toString(), colPos.totalF, y);
+                    doc.text(result.totalM.toString(), colPos.totalM, y);
                     doc.text(result.poang.toString(), colPos.poang, y);
                     if (hasSarAny) {
                         doc.setFont('helvetica', 'normal');
@@ -1208,12 +1275,14 @@
         function autoSave() {
             try {
                 const sarStations = getSarStations();
+                const maxMals = getMaxMalAll();
                 const data = {
                     title: document.getElementById('competitionTitle').value,
                     date: document.getElementById('date').value,
                     leader: document.getElementById('leader').value,
                     freeText: document.getElementById('freeText').value,
                     sarStations: sarStations,
+                    maxMals: maxMals,
                     groupsConfig: document.getElementById('groupsConfig').value,
                     rows: []
                 };
@@ -1245,13 +1314,20 @@
                     document.getElementById('groupsConfig').value = data.groupsConfig;
                 }
 
+                // Restore max mål config
+                if (data.maxMals && Array.isArray(data.maxMals)) {
+                    for (let i = 0; i < NUM_STATIONS; i++) {
+                        const v = data.maxMals[i];
+                        document.getElementById('maxMal' + (i + 1)).value = (v >= 1 && v <= 6) ? v : 6;
+                    }
+                }
+
                 // Restore sar station config
                 if (data.sarStations && Array.isArray(data.sarStations)) {
                     for (let i = 0; i < NUM_STATIONS; i++) {
                         document.getElementById('sarStn' + (i + 1)).checked = !!data.sarStations[i];
                     }
                 } else if (data.mode) {
-                    // Legacy: old mode 3 = all S, mode 2 = no S
                     for (let i = 0; i < NUM_STATIONS; i++) {
                         document.getElementById('sarStn' + (i + 1)).checked = (data.mode === 3);
                     }
@@ -1286,6 +1362,7 @@
             document.getElementById('groupsConfig').value = 'A,C,R';
             for (let i = 1; i <= NUM_STATIONS; i++) {
                 document.getElementById('sarStn' + i).checked = false;
+                document.getElementById('maxMal' + i).value = 6;
             }
             updateTableHeader();
             addRow(); addRow();
