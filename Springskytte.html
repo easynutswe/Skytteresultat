@@ -119,7 +119,9 @@
             <div class="meta-fields">
                 <input type="text" id="competitionTitle" placeholder="Tävlingsnamn" value="Springskytte">
                 <input type="date" id="date" class="date-input">
-                <input type="text" id="leader" placeholder="Skjutledare">
+                <div class="name-input-container" style="width: 100%;">
+                <input type="text" id="leader" placeholder="Skjutledare" onblur="this.value = capitalizeName(this.value)">
+                </div>
             </div>
             <div class="meta-freetext">
                 <div class="editor-toolbar">
@@ -216,6 +218,85 @@
                     preloadedMembers = lines.map(name => capitalizeName(name));
                 }
             } catch(e) {}
+        }
+
+        function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
+            const container = nameInput.parentElement;
+            let dropdown = container.querySelector('.suggestions-dropdown');
+            if (!dropdown) {
+                dropdown = document.createElement('div');
+                dropdown.className = 'suggestions-dropdown';
+                container.appendChild(dropdown);
+            }
+            let currentHighlightIndex = -1;
+            let isAutoCompleting = false;
+            let wasAutoCompleted = false;
+            let originalAutoCompletedValue = '';
+
+            nameInput.addEventListener('input', function() {
+                if (isAutoCompleting) { isAutoCompleting = false; return; }
+                if (wasAutoCompleted && this.value !== originalAutoCompletedValue) { hideDropdown(); return; }
+                const query = this.value.toLowerCase().trim();
+                currentHighlightIndex = -1;
+                if (query.length === 0 || preloadedMembers.length === 0) { hideDropdown(); return; }
+                const exactMatches = preloadedMembers.filter(name => name.toLowerCase().startsWith(query));
+                const partialMatches = preloadedMembers.filter(name => name.toLowerCase().includes(query) && !name.toLowerCase().startsWith(query));
+                const allMatches = [...exactMatches, ...partialMatches];
+                if (allMatches.length === 0) { hideDropdown(); return; }
+                if (allMatches.length === 1 && exactMatches.length === 1) {
+                    isAutoCompleting = true; wasAutoCompleted = true; originalAutoCompletedValue = allMatches[0];
+                    const currentValue = allMatches[0];
+                    setTimeout(() => {
+                        this.value = currentValue; hideDropdown();
+                        if (isLeaderField) { const f = document.getElementById('freeText'); if (f) f.focus(); }
+                        else { const row = this.closest('tr'); const g = row ? row.querySelector('.group') : null; if (g) g.focus(); }
+                    }, 100);
+                    return;
+                }
+                showSuggestions(allMatches.slice(0, 6));
+            });
+
+            nameInput.addEventListener('keydown', function(e) {
+                const items = dropdown.querySelectorAll('.suggestion-item');
+                if (e.key === 'ArrowDown') { e.preventDefault(); currentHighlightIndex = Math.min(currentHighlightIndex + 1, items.length - 1); updateHighlight(); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); currentHighlightIndex = Math.max(currentHighlightIndex - 1, -1); updateHighlight(); }
+                else if (e.key === 'Enter') { e.preventDefault(); if (currentHighlightIndex >= 0 && items[currentHighlightIndex]) selectSuggestion(items[currentHighlightIndex].textContent); }
+                else if (e.key === 'Escape') { hideDropdown(); }
+                else if (e.key === 'Tab') { hideDropdown(); }
+            });
+
+            nameInput.addEventListener('blur', function() { setTimeout(() => hideDropdown(), 150); });
+            nameInput.addEventListener('focus', function() { if (this.value === '') { isAutoCompleting = false; wasAutoCompleted = false; originalAutoCompletedValue = ''; } });
+
+            function showSuggestions(matches) {
+                dropdown.innerHTML = '';
+                matches.forEach(name => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = name;
+                    item.addEventListener('click', () => selectSuggestion(name));
+                    dropdown.appendChild(item);
+                });
+                dropdown.style.display = 'block';
+                setTimeout(() => {
+                    const inputRect = nameInput.getBoundingClientRect();
+                    const dropdownHeight = dropdown.offsetHeight;
+                    dropdown.style.left = inputRect.left + 'px';
+                    dropdown.style.width = inputRect.width + 'px';
+                    dropdown.style.top = (inputRect.top - dropdownHeight - 5) + 'px';
+                }, 0);
+            }
+
+            function hideDropdown() { dropdown.style.display = 'none'; currentHighlightIndex = -1; }
+            function updateHighlight() { dropdown.querySelectorAll('.suggestion-item').forEach((item, i) => { item.classList.toggle('highlighted', i === currentHighlightIndex); }); }
+            function selectSuggestion(name) {
+                isAutoCompleting = true; wasAutoCompleted = true; originalAutoCompletedValue = name;
+                nameInput.value = name; hideDropdown(); nameInput.dispatchEvent(new Event('change'));
+                setTimeout(() => {
+                    if (isLeaderField) { const f = document.getElementById('freeText'); if (f) f.focus(); }
+                    else { const row = nameInput.closest('tr'); const g = row ? row.querySelector('.group') : null; if (g) g.focus(); }
+                }, 50);
+            }
         }
 
         // Fritextformatering
@@ -417,27 +498,18 @@
             
             // Namn
             const nameCell = row.insertCell();
+            const nameContainer = document.createElement('div');
+            nameContainer.className = 'name-input-container';
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
-            nameInput.className = 'name';
-            nameInput.classList.add('name-input');
+            nameInput.className = 'name name-input';
             nameInput.placeholder = 'Namn';
-            
-            if (preloadedMembers.length > 0) {
-                const datalistId = 'membersList' + Date.now();
-                const datalist = document.createElement('datalist');
-                datalist.id = datalistId;
-                preloadedMembers.forEach(member => {
-                    const option = document.createElement('option');
-                    option.value = member;
-                    datalist.appendChild(option);
-                });
-                nameInput.setAttribute('list', datalistId);
-                nameCell.appendChild(nameInput);
-                nameCell.appendChild(datalist);
-            } else {
-                nameCell.appendChild(nameInput);
-            }
+            nameInput.addEventListener('blur', function() {
+                this.value = capitalizeName(this.value);
+            });
+            nameContainer.appendChild(nameInput);
+            nameCell.appendChild(nameContainer);
+            setupNameInputWithSuggestions(nameInput);
             
             // Grupp
             const groupCell = row.insertCell();
@@ -943,7 +1015,13 @@
         }
         document.addEventListener('input', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
         document.addEventListener('change', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
-        setTimeout(() => { autoRestore(); customLogoDataUrl = localStorage.getItem('customLogo') || null; preloadMembers(); }, 100);
+        setTimeout(() => {
+            autoRestore();
+            customLogoDataUrl = localStorage.getItem('customLogo') || null;
+            preloadMembers();
+            const leaderInput = document.getElementById('leader');
+            setupNameInputWithSuggestions(leaderInput, true);
+        }, 100);
 
     </script>
     <div class="autosave-status" id="saveStatus">Sparad</div>
