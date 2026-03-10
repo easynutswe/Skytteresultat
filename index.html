@@ -678,6 +678,7 @@
             if (encrypted && !hasPlaintext) {
                 // Need to unlock
                 document.getElementById('unlockOverlay').style.display = 'flex';
+                setTimeout(() => document.getElementById('unlockPassword').focus(), 100);
             }
             showHome();
 
