@@ -1,4 +1,4 @@
-# UVPSK Resultatmallar
+# Resultatmallar
 
 Webbverktyg for att skapa och skriva ut resultatblad for skyttetavlingar.
 

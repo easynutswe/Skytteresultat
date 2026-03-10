@@ -16,27 +16,124 @@
         }
 
         .sidebar {
-            width: 200px;
-            min-width: 200px;
+            width: 220px;
+            min-width: 220px;
             background: #1a1f2e;
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
 
-        .sidebar-logo {
-            padding: 16px 14px;
+        .sidebar-settings {
+            padding: 12px 10px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
-        .sidebar-logo img {
+        .sidebar-settings h3 {
+            color: rgba(255,255,255,0.4);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
+
+        .setting-group {
+            margin-bottom: 8px;
+        }
+
+        .setting-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            margin-bottom: 3px;
+            padding: 0 4px;
+        }
+
+        .setting-input {
             width: 100%;
+            padding: 5px 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.85);
+            font-size: 12px;
+            font-family: inherit;
+        }
+
+        .setting-input::placeholder { color: rgba(255,255,255,0.25); }
+        .setting-input:focus { outline: none; border-color: rgba(59,130,246,0.5); }
+
+        .setting-file-label {
+            display: block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.55);
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.15s;
+        }
+
+        .setting-file-label:hover {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .setting-file-label input { display: none; }
+
+        .setting-status {
+            font-size: 10px;
+            color: #34d399;
+            padding: 2px 4px;
+            margin-top: 2px;
+        }
+
+        .setting-btn-row {
+            display: flex;
+            gap: 4px;
+        }
+
+        .setting-btn-row .setting-file-label { flex: 1; }
+
+        .setting-btn-clear {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(239,68,68,0.15);
+            color: rgba(239,68,68,0.7);
+            font-size: 11px;
+            cursor: pointer;
+            border: 1px solid rgba(239,68,68,0.2);
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .setting-btn-clear:hover {
+            background: rgba(239,68,68,0.25);
+            color: rgba(239,68,68,0.9);
+        }
+
+        .logo-preview-small {
+            max-width: 100%;
+            max-height: 40px;
+            margin-top: 4px;
+            border-radius: 3px;
             display: block;
         }
 
         .sidebar-nav {
             flex: 1;
             padding: 8px 6px;
+        }
+
+        .sidebar-nav h3 {
+            color: rgba(255,255,255,0.4);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            padding: 0 6px;
         }
 
         .nav-item {
@@ -81,22 +178,6 @@
         .nav-item[data-page="Milsnabb"] .nav-dot { background: #f87171; }
         .nav-item[data-page="Precision"] .nav-dot { background: #60a5fa; }
 
-        .sidebar-footer {
-            padding: 10px 14px;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            text-align: center;
-        }
-
-        .sidebar-footer a {
-            color: rgba(255,255,255,0.2);
-            text-decoration: none;
-            font-size: 11px;
-        }
-
-        .sidebar-footer a:hover {
-            color: rgba(255,255,255,0.45);
-        }
-
         .main {
             flex: 1;
             height: 100vh;
@@ -123,8 +204,42 @@
 <body>
 
     <nav class="sidebar">
+        <div class="sidebar-settings">
+            <h3>Inställningar</h3>
+
+            <div class="setting-group">
+                <div class="setting-label">Mailadress för resultat</div>
+                <input type="email" class="setting-input" id="emailSetting" placeholder="namn@example.com" onchange="saveSettings()">
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-label">Logotyp (PDF-header)</div>
+                <div class="setting-btn-row">
+                    <label class="setting-file-label">
+                        Ladda
+                        <input type="file" accept="image/png,image/jpeg,image/jpg" onchange="loadLogo(this)">
+                    </label>
+                    <button class="setting-btn-clear" onclick="clearLogo()">Rensa</button>
+                </div>
+                <div class="setting-status" id="logoStatus"></div>
+                <div id="logoPreview"></div>
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-label">Medlemslista (CSV)</div>
+                <div class="setting-btn-row">
+                    <label class="setting-file-label">
+                        Ladda
+                        <input type="file" accept=".csv,.txt" onchange="loadMembers(this)">
+                    </label>
+                    <button class="setting-btn-clear" onclick="clearMembers()">Rensa</button>
+                </div>
+                <div class="setting-status" id="membersStatus"></div>
+            </div>
+        </div>
 
         <div class="sidebar-nav">
+            <h3>Tävlingsformer</h3>
             <button class="nav-item" data-page="Springskytte" onclick="loadPage('Springskytte')">
                 <span class="nav-dot"></span> Springskytte
             </button>
@@ -155,6 +270,67 @@
                 btn.classList.toggle('active', btn.dataset.page === name);
             });
         }
+
+        function saveSettings() {
+            const email = document.getElementById('emailSetting').value;
+            localStorage.setItem('resultEmail', email);
+        }
+
+        function loadLogo(input) {
+            if (!input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                localStorage.setItem('customLogo', e.target.result);
+                showLogoStatus();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        function clearLogo() {
+            localStorage.removeItem('customLogo');
+            document.getElementById('logoStatus').textContent = '';
+            document.getElementById('logoPreview').innerHTML = '';
+        }
+
+        function showLogoStatus() {
+            const logo = localStorage.getItem('customLogo');
+            if (logo) {
+                document.getElementById('logoStatus').textContent = 'Logotyp laddad';
+                document.getElementById('logoPreview').innerHTML = '<img class="logo-preview-small" src="' + logo + '">';
+            }
+        }
+
+        function loadMembers(input) {
+            if (!input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const content = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+                const lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+                localStorage.setItem('membersList', JSON.stringify(lines));
+                document.getElementById('membersStatus').textContent = lines.length + ' medlemmar laddade';
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        function clearMembers() {
+            localStorage.removeItem('membersList');
+            document.getElementById('membersStatus').textContent = '';
+        }
+
+        // Restore on load
+        (function() {
+            const email = localStorage.getItem('resultEmail');
+            if (email) document.getElementById('emailSetting').value = email;
+            showLogoStatus();
+            const members = localStorage.getItem('membersList');
+            if (members) {
+                try {
+                    const list = JSON.parse(members);
+                    document.getElementById('membersStatus').textContent = list.length + ' medlemmar laddade';
+                } catch(e) {}
+            }
+        })();
     </script>
 
 </body>

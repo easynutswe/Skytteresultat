@@ -100,25 +100,9 @@
             <p>6. Glöm inte att bifoga den nedladdade filen till mailet!</p>
             <p>7. Spara gärna en digital kopia (Spara CSV) som du kan ladda upp (Ladda CSV) för att editera om du fyllt i något resultat fel och skicka in på nytt.</p>
             <p><strong>8. Använd "Skapa PDF" för att generera en PDF-rapport av resultaten!</strong></p>
-            <p><strong>9. Använd "Ladda medlemmar" för att ladda en medlemsregister och få snabbare namnförslag!</strong></p>
+            <p><strong>9. Medlemslista, logotyp och e-post konfigureras via sidomenyn (Inställningar).</strong></p>
         </div>
 
-                <div class="setup-row">
-            <div class="setup-box">
-                <h4>Ladda medlemmar</h4>
-                <p>CSV-fil med namn (ett per rad)</p>
-                <input type="file" id="membersFile" accept=".csv,.txt" onchange="preloadMembers()">
-                <span class="members-count" id="membersCount"></span>
-            </div>
-            <div class="setup-box">
-                <h4>Ladda logotyp</h4>
-                <p>Bild för PDF-header (valfritt)</p>
-                <input type="file" id="logoFile" accept="image/png,image/jpeg,image/jpg" onchange="preloadLogo()">
-                <span class="members-count" id="logoStatus"></span>
-                <div id="logoPreviewContainer"></div>
-            </div>
-            <div class="setup-box setup-box--neutral"></div>
-        </div>
 
                 <div class="meta-row">
             <div class="meta-fields">
@@ -198,7 +182,7 @@
         <p>1. Filerna har sparats i din Downloads-mapp:</p>
         <p>&nbsp;&nbsp;&nbsp;• "[tävlingsnamn]_[datum].csv"</p>
         <p>&nbsp;&nbsp;&nbsp;• "[tävlingsnamn]_[datum].pdf"</p>
-        <p>2. Skicka BÅDA filerna (.csv och .pdf) till styrelsen</p>
+        <p>2. Skicka BÅDA filerna (.csv och .pdf) till ansvarig</p>
         <button onclick="closeModal()">OK</button>
     </div>
     <div class="modal-backdrop" onclick="closeModal()"></div>
@@ -236,64 +220,15 @@
         }
 
         function preloadMembers() {
-            const fileInput = document.getElementById('membersFile');
-            const countSpan = document.getElementById('membersCount');
-            
-            if (!fileInput.files[0]) {
-                alert('Välj en fil först');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const text = e.target.result;
-                    const content = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
-                    
-                    const lines = content.split(/\r?\n/)
-                        .map(line => line.trim())
-                        .filter(line => line.length > 0);
-                    
+            try {
+                const saved = localStorage.getItem('membersList');
+                if (saved) {
+                    const lines = JSON.parse(saved);
                     preloadedMembers = lines.map(name => capitalizeName(name));
-                    
-                    countSpan.textContent = `(${preloadedMembers.length} medlemmar laddade)`;
-                    countSpan.style.color = 'green';
-                    
-                } catch (error) {
-                    alert('Fel vid läsning av fil: ' + error.message);
-                    preloadedMembers = [];
-                    countSpan.textContent = '';
                 }
-            };
-            
-            reader.readAsText(fileInput.files[0]);
+            } catch(e) {}
         }
 
-        function preloadLogo() {
-            const fileInput = document.getElementById('logoFile');
-            const statusSpan = document.getElementById('logoStatus');
-            
-            if (!fileInput.files[0]) {
-                alert('Välj en fil först');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    customLogoDataUrl = e.target.result;
-                    try { localStorage.setItem('customLogo', customLogoDataUrl); } catch(e) {}
-                    statusSpan.textContent = '(Logotyp laddad)';
-                    statusSpan.style.color = 'green';
-                } catch (error) {
-                    alert('Fel vid läsning av logotyp: ' + error.message);
-                    customLogoDataUrl = null;
-                    statusSpan.textContent = '';
-                }
-            };
-            
-            reader.readAsDataURL(fileInput.files[0]);
-        }
 
         function setupNameInputWithSuggestions(nameInput) {
             const container = nameInput.parentElement;
@@ -999,14 +934,15 @@
             
             const competitionTitle = document.getElementById('competitionTitle').value;
             const date = document.getElementById('date').value;
-            const emailSubject = encodeURIComponent(`UVPSK resultat ${competitionTitle} ${date}`);
-            const emailBody = encodeURIComponent('Hej!\n\nBifogat finns resultaten från dagens tävling i både CSV- och PDF-format.\n\nMvh');
-            
             document.getElementById('submitModal').style.display = 'block';
             document.querySelector('.modal-backdrop').style.display = 'block';
-            
-            setTimeout(() => {
-            }, 1000);
+
+            const resultEmail = localStorage.getItem('resultEmail');
+            if (resultEmail) {
+                const emailSubject = encodeURIComponent(`Resultat ${competitionTitle} ${date}`);
+                const emailBody = encodeURIComponent('Hej!\n\nBifogat finns resultaten från dagens tävling i både CSV- och PDF-format.\n\nMvh');
+                setTimeout(() => { window.location.href = `mailto:${resultEmail}?subject=${emailSubject}&body=${emailBody}`; }, 500);
+            }
         }
 
         function closeModal() {
@@ -1350,7 +1286,7 @@
         }
     
         // === AUTOSAVE ===
-        const STORAGE_KEY = 'uvpsk_nationell';
+        const STORAGE_KEY = 'nationell_autosave';
         function autoSave() {
             try {
                 const data = { title: document.getElementById('competitionTitle').value, date: document.getElementById('date').value, leader: document.getElementById('leader').value, freeText: document.getElementById('freeText').value, rows: [] };
@@ -1403,7 +1339,8 @@
         document.addEventListener('input', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
         document.addEventListener('change', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
         setTimeout(() => { autoRestore(); }, 100);
-        if (!customLogoDataUrl) { const savedLogo = localStorage.getItem('customLogo'); if (savedLogo) { customLogoDataUrl = savedLogo; document.getElementById('logoStatus').textContent = '(Logotyp laddad)'; } }
+        customLogoDataUrl = localStorage.getItem('customLogo') || null;
+        preloadMembers();
 
     </script>
     <div class="autosave-status" id="saveStatus">Sparad</div>
