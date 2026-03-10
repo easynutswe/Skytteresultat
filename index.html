@@ -157,7 +157,7 @@
     <script>
         function loadPage(name) {
             const main = document.getElementById('mainContent');
-            main.innerHTML = '<iframe src="' + name + '.html"></iframe>';
+            main.innerHTML = '<iframe src="' + name + '.html?v=' + Date.now() + '"></iframe>';
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.page === name);
             });
