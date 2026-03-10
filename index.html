@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVPSK Resultatmallar</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            background: #f4f6f8;
+        }
+
+        .sidebar {
+            width: 200px;
+            min-width: 200px;
+            background: #1a1f2e;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .sidebar-logo {
+            padding: 16px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .sidebar-logo img {
+            width: 100%;
+            display: block;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 8px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px;
+            border-radius: 6px;
+            color: rgba(255,255,255,0.55);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 2px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.85);
+        }
+
+        .nav-item.active {
+            background: rgba(59,130,246,0.15);
+            color: #60a5fa;
+        }
+
+        .nav-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .nav-item[data-page="Springskytte"] .nav-dot { background: #34d399; }
+        .nav-item[data-page="Magnumsprecision"] .nav-dot { background: #fbbf24; }
+        .nav-item[data-page="Nationell"] .nav-dot { background: #818cf8; }
+        .nav-item[data-page="Milsnabb"] .nav-dot { background: #f87171; }
+        .nav-item[data-page="Precision"] .nav-dot { background: #60a5fa; }
+
+        .sidebar-footer {
+            padding: 10px 14px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+
+        .sidebar-footer a {
+            color: rgba(255,255,255,0.2);
+            text-decoration: none;
+            font-size: 11px;
+        }
+
+        .sidebar-footer a:hover {
+            color: rgba(255,255,255,0.45);
+        }
+
+        .main {
+            flex: 1;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .welcome {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <img src="https://www.uvpsk.se/wp-content/uploads/2025/09/Logo.jpg" alt="UVPSK">
+        </div>
+
+        <div class="sidebar-nav">
+            <button class="nav-item" data-page="Springskytte" onclick="loadPage('Springskytte')">
+                <span class="nav-dot"></span> Springskytte
+            </button>
+            <button class="nav-item" data-page="Magnumsprecision" onclick="loadPage('Magnumsprecision')">
+                <span class="nav-dot"></span> Magnumprecision
+            </button>
+            <button class="nav-item" data-page="Nationell" onclick="loadPage('Nationell')">
+                <span class="nav-dot"></span> Nationell Helmatch
+            </button>
+            <button class="nav-item" data-page="Milsnabb" onclick="loadPage('Milsnabb')">
+                <span class="nav-dot"></span> Milsnabb
+            </button>
+            <button class="nav-item" data-page="Precision" onclick="loadPage('Precision')">
+                <span class="nav-dot"></span> Precision
+            </button>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="https://www.uvpsk.se">uvpsk.se</a>
+        </div>
+    </nav>
+
+    <main class="main" id="mainContent">
+        <div class="welcome">Välj en tävlingsform i menyn</div>
+    </main>
+
+    <script>
+        function loadPage(name) {
+            const main = document.getElementById('mainContent');
+            main.innerHTML = '<iframe src="' + name + '.html"></iframe>';
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.page === name);
+            });
+        }
+    </script>
+
+</body>
+</html>
