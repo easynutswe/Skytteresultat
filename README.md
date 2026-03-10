@@ -1,6 +1,6 @@
 # UVPSK Resultatmallar
 
-Webbverktyg for att skapa och skriva ut resultatblad for skyttetavlingar. Byggt for [UVPSK](https://www.uvpsk.se) (Uppsala Voluntary Pistol Shooting Club).
+Webbverktyg for att skapa och skriva ut resultatblad for skyttetavlingar. Byggt for [UVPSK](https://www.uvpsk.se).
 
 ## Tavlingsformer
 
