@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultatmallar</title>
+    <title>EasyResultat</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -24,43 +24,16 @@
             height: 100vh;
         }
 
-        .sidebar-home {
-            padding: 12px 10px;
+        .sidebar-brand {
+            padding: 14px 12px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
-        .home-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .home-btn img {
-            max-width: 100%;
-            max-height: 50px;
-            display: block;
-        }
-
-        .home-btn .home-text {
-            color: rgba(255,255,255,0.7);
-            font-size: 14px;
-            font-weight: 600;
-            font-family: inherit;
-        }
-
-        .home-btn:hover {
-            background: rgba(255,255,255,0.06);
-        }
-
-        .home-btn.active {
-            background: rgba(59,130,246,0.15);
+        .brand-text {
+            color: rgba(255,255,255,0.85);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
         .sidebar-nav {
@@ -113,6 +86,7 @@
             flex-shrink: 0;
         }
 
+        .nav-item[data-page="Information"] .nav-dot { background: #9ca3af; }
         .nav-item[data-page="Springskytte"] .nav-dot { background: #34d399; }
         .nav-item[data-page="Magnumsprecision"] .nav-dot { background: #fbbf24; }
         .nav-item[data-page="Nationell"] .nav-dot { background: #818cf8; }
@@ -334,14 +308,15 @@
 <body>
 
     <nav class="sidebar">
-        <div class="sidebar-home">
-            <button class="home-btn active" id="homeBtn" onclick="showHome()">
-                <span class="home-text" id="homeBtnText">Resultatmallar</span>
-            </button>
+        <div class="sidebar-brand">
+            <span class="brand-text">EasyResultat</span>
         </div>
 
         <div class="sidebar-nav">
-            <h3>Tävlingsformer</h3>
+            <h3>Meny</h3>
+            <button class="nav-item active" data-page="Information" onclick="showHome()">
+                <span class="nav-dot"></span> Information
+            </button>
             <button class="nav-item" data-page="Springskytte" onclick="loadPage('Springskytte')">
                 <span class="nav-dot"></span> Springskytte
             </button>
@@ -366,7 +341,7 @@
         const homeHTML = `
         <div class="home-page">
             <div class="container">
-                <h1 class="page-title">Resultatmallar</h1>
+                <h1 class="page-title">Information</h1>
 
                 <div class="instructions">
                     <h3>Om verktyget</h3>
@@ -424,8 +399,9 @@
 
         function showHome() {
             document.getElementById('mainContent').innerHTML = homeHTML;
-            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('homeBtn').classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.page === 'Information');
+            });
             restoreHomeState();
         }
 
@@ -435,7 +411,6 @@
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.page === name);
             });
-            document.getElementById('homeBtn').classList.remove('active');
         }
 
         function saveEmail() {
@@ -470,7 +445,6 @@
                 status.textContent = '';
                 preview.innerHTML = '';
             }
-            updateHomeButton();
         }
 
         function loadMembers(input) {
@@ -493,17 +467,6 @@
             if (el) el.textContent = '';
         }
 
-        function updateHomeButton() {
-            const logo = localStorage.getItem('customLogo');
-            const btn = document.getElementById('homeBtn');
-            const text = document.getElementById('homeBtnText');
-            if (logo) {
-                btn.innerHTML = '<img src="' + logo + '" style="max-width:100%;max-height:50px;">';
-            } else {
-                btn.innerHTML = '<span class="home-text">Resultatmallar</span>';
-            }
-        }
-
         function restoreHomeState() {
             const email = localStorage.getItem('resultEmail');
             const emailEl = document.getElementById('emailSetting');
@@ -522,7 +485,6 @@
         }
 
         // Init
-        updateHomeButton();
         showHome();
     </script>
 
