@@ -1005,7 +1005,7 @@
             const hasSarAny = sarCount > 0;
 
             const tableX = 10;
-            const tableW = 270;
+            const tableW = 280;
 
             doc.setTextColor(0, 100, 200);
             doc.setFontSize(21);
@@ -1045,32 +1045,30 @@
             doc.setTextColor(0, 0, 0);
             doc.setLineWidth(0.5);
 
-            // Build column positions dynamically
-            const totalDataCols = NUM_STATIONS * 2 + sarCount; // T+F per station + S for sar stations
-            const totalSumCols = hasSarAny ? 4 : 3; // Träff, Figur, Poäng [, Särp]
-            const stnStart = tableX + 75;
-            const availableWidth = tableW - 75 - totalSumCols * 18;
-            const stnColWidth = Math.min(10, availableWidth / totalDataCols);
+            // Build column positions dynamically - Milsnabb-style grouped layout
+            const colW = 9; // width per sub-column (T, F, S)
+            const stnStart = tableX + 78;
 
             const colPos = {
                 place: tableX + 2,
                 name: tableX + 12,
-                group: tableX + 65,
+                group: tableX + 68,
                 stations: []
             };
 
             let xPos = stnStart;
             for (let s = 0; s < NUM_STATIONS; s++) {
-                const stn = { t: xPos, f: xPos + stnColWidth };
-                xPos += stnColWidth * 2;
+                const stn = { start: xPos, t: xPos, f: xPos + colW };
                 if (sarStations[s]) {
-                    stn.s = xPos;
-                    xPos += stnColWidth;
+                    stn.s = xPos + colW * 2;
+                    xPos += colW * 3 + 3; // 3 cols + gap between stations
+                } else {
+                    xPos += colW * 2 + 3; // 2 cols + gap between stations
                 }
                 colPos.stations.push(stn);
             }
 
-            xPos += 3;
+            xPos += 2;
             colPos.totalT = xPos;
             colPos.totalF = xPos + 15;
             colPos.poang = xPos + 30;
@@ -1078,7 +1076,7 @@
                 colPos.sarp = xPos + 45;
             }
 
-            // Draw header line
+            // === HEADER ROW 1: Station group labels ===
             doc.line(tableX, y - 5, tableX + tableW, y - 5);
             doc.setFontSize(9);
             doc.text('Pl.', colPos.place, y);
@@ -1086,17 +1084,32 @@
             doc.text('Grp', colPos.group, y);
 
             for (let s = 0; s < NUM_STATIONS; s++) {
-                doc.text(`${s + 1}T`, colPos.stations[s].t, y);
-                doc.text(`${s + 1}F`, colPos.stations[s].f, y);
-                if (sarStations[s]) {
-                    doc.text(`${s + 1}S`, colPos.stations[s].s, y);
-                }
+                const stn = colPos.stations[s];
+                const stnCols = sarStations[s] ? 3 : 2;
+                const stnWidth = stnCols * colW;
+                const label = `Station ${s + 1}`;
+                const labelW = doc.getTextWidth(label);
+                doc.text(label, stn.start + (stnWidth - labelW) / 2, y);
             }
+
             doc.text('Träff', colPos.totalT, y);
             doc.text('Figur', colPos.totalF, y);
             doc.text('Poäng', colPos.poang, y);
             if (hasSarAny) {
                 doc.text('Särp', colPos.sarp, y);
+            }
+
+            doc.line(tableX, y + 3, tableX + tableW, y + 3);
+            y += 8;
+
+            // === HEADER ROW 2: Sub-column labels (T, F, S) ===
+            doc.setFontSize(8);
+            for (let s = 0; s < NUM_STATIONS; s++) {
+                doc.text('T', colPos.stations[s].t, y);
+                doc.text('F', colPos.stations[s].f, y);
+                if (sarStations[s]) {
+                    doc.text('S', colPos.stations[s].s, y);
+                }
             }
 
             doc.line(tableX, y + 3, tableX + tableW, y + 3);
