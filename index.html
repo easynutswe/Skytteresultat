@@ -215,22 +215,7 @@
 
         .btn-action:hover { background: #f0f7ff; border-color: #3b82f6; }
 
-        .btn-action-clear {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid #fecaca;
-            background: #fef2f2;
-            color: #dc2626;
-            font-size: 12px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .btn-action-clear:hover { background: #fee2e2; }
-
-        .setting-status {
+.setting-status {
             font-size: 12px;
             color: #16a34a;
             margin-top: 4px;
@@ -287,8 +272,15 @@
             margin-top: 10px;
         }
 
-        .section-action input[type="email"] {
+        .input-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
             width: 300px;
+        }
+
+        .input-row input[type="email"] {
+            flex: 1;
             padding: 6px 8px;
             border: 1px solid #d0d5dd;
             border-radius: 6px;
@@ -296,10 +288,33 @@
             font-family: inherit;
         }
 
-        .section-action input[type="email"]:focus {
+        .input-row input[type="email"]:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px rgba(59,130,246,0.12);
+        }
+
+        .input-row .btn-action {
+            flex: 1;
+        }
+
+        .btn-action-clear-sm {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #9ca3af;
+            font-size: 11px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-action-clear-sm:hover {
+            border-color: #fecaca;
+            background: #fef2f2;
+            color: #dc2626;
         }
 
         @media (max-width: 900px) { .setup-row { grid-template-columns: 1fr; } }
@@ -356,7 +371,10 @@
                     <p>Ange den mailadress som resultat ska skickas till. När du trycker "Skicka resultat" i en tävlingsform laddas CSV- och PDF-filer ner, och ett mail öppnas automatiskt till denna adress.</p>
                     <p>Lämna tomt om du inte vill att mail ska öppnas automatiskt.</p>
                     <div class="section-action">
-                        <input type="email" id="emailSetting" placeholder="namn@example.com" onchange="saveEmail()">
+                        <div class="input-row">
+                            <input type="email" id="emailSetting" placeholder="namn@example.com" onchange="saveEmail()">
+                            <button class="btn-action-clear-sm" onclick="clearEmail()">Rensa</button>
+                        </div>
                     </div>
                 </div>
 
@@ -365,12 +383,12 @@
                     <p>Ladda upp en logotyp som visas överst i genererade PDF-rapporter. Stöder PNG och JPEG.</p>
                     <p>Rekommenderad storlek: ca 300–600 px bred. Bilden skalas automatiskt i PDF:en. Om ingen logotyp laddas genereras PDF utan header-bild.</p>
                     <div class="section-action">
-                        <div class="btn-row">
+                        <div class="input-row">
                             <label class="btn-action">
                                 Ladda bild
                                 <input type="file" accept="image/png,image/jpeg,image/jpg" onchange="loadLogo(this)" style="display:none">
                             </label>
-                            <button class="btn-action-clear" onclick="clearLogo()">Rensa</button>
+                            <button class="btn-action-clear-sm" onclick="clearLogo()">Rensa</button>
                         </div>
                         <div class="setting-status" id="logoStatus"></div>
                         <div id="logoPreview"></div>
@@ -384,12 +402,12 @@
                     <pre>Anna Andersson\nBjörn Björkman\nCecilia Carlsson</pre>
                     <p>Filen kan vara .csv eller .txt, med eller utan BOM. Tomma rader ignoreras.</p>
                     <div class="section-action">
-                        <div class="btn-row">
+                        <div class="input-row">
                             <label class="btn-action">
                                 Ladda CSV
                                 <input type="file" accept=".csv,.txt" onchange="loadMembers(this)" style="display:none">
                             </label>
-                            <button class="btn-action-clear" onclick="clearMembers()">Rensa</button>
+                            <button class="btn-action-clear-sm" onclick="clearMembers()">Rensa</button>
                         </div>
                         <div class="setting-status" id="membersStatus"></div>
                     </div>
@@ -416,6 +434,12 @@
         function saveEmail() {
             const el = document.getElementById('emailSetting');
             if (el) localStorage.setItem('resultEmail', el.value);
+        }
+
+        function clearEmail() {
+            localStorage.removeItem('resultEmail');
+            const el = document.getElementById('emailSetting');
+            if (el) el.value = '';
         }
 
         function loadLogo(input) {
