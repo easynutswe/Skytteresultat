@@ -140,9 +140,10 @@
         }
 
         .container {
+            width: 1750px;
             margin: 0;
             background-color: white;
-            padding: 24px;
+            padding: 24px 24px 200px 24px;
             min-height: 100vh;
         }
 
@@ -271,6 +272,62 @@
             border-radius: 4px;
         }
 
+        .section-box {
+            background-color: #f0f7ff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border: 1px solid #c7ddf5;
+            margin-bottom: 16px;
+        }
+
+        .section-box h4 {
+            margin: 0 0 8px 0;
+            color: #1a5276;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .section-box p {
+            margin: 4px 0;
+            font-size: 13px;
+            color: #5a6778;
+            line-height: 1.5;
+        }
+
+        .section-box pre {
+            background: white;
+            border: 1px solid #c7ddf5;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #374151;
+            margin: 6px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .section-box a {
+            color: #3b82f6;
+        }
+
+        .section-action {
+            margin-top: 10px;
+        }
+
+        .section-action input[type="email"] {
+            width: 300px;
+            padding: 6px 8px;
+            border: 1px solid #d0d5dd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .section-action input[type="email"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.12);
+        }
+
         @media (max-width: 900px) { .setup-row { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -309,28 +366,30 @@
         const homeHTML = `
         <div class="home-page">
             <div class="container">
-                <h1 class="page-title">Inställningar</h1>
+                <h1 class="page-title">Resultatmallar</h1>
 
                 <div class="instructions">
-                    <h3>Så här gör du</h3>
-                    <p>1. Ställ in mailadress, logotyp och medlemslista nedan (sparas automatiskt).</p>
-                    <p>2. Välj tävlingsform i menyn till vänster.</p>
-                    <p>3. Fyll i skyttarnas namn och resultat. Namn föreslås automatiskt från medlemslistan.</p>
-                    <p>4. Använd "Skapa PDF" för att generera en snygg resultatrapport.</p>
-                    <p>5. Använd "Skicka resultat" för att ladda ner CSV + PDF och öppna ett mail.</p>
-                    <p>6. "Spara CSV" sparar en kopia som kan laddas upp igen med "Ladda CSV" om du behöver redigera.</p>
+                    <h3>Om verktyget</h3>
+                    <p>Webbverktyg för att registrera och rapportera skytteresultat. Välj tävlingsform i menyn, fyll i resultat, och exportera som PDF eller CSV.</p>
+                    <p>Alla inställningar nedan sparas automatiskt i din webbläsare och delas mellan alla tävlingsformer.</p>
+                    <p style="margin-top: 8px;"><strong>Så här gör du:</strong> Konfigurera mailadress, logotyp och medlemslista nedan. Välj sedan tävlingsform i menyn till vänster. Fyll i skyttarnas namn och resultat. Använd "Skapa PDF" för rapport eller "Skicka resultat" för att exportera och maila.</p>
+                    <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">Öppen källkod under MIT-licens — <a href="https://github.com/easynutswe/Skytteresultat" target="_blank" style="color: #3b82f6;">github.com/easynutswe/Skytteresultat</a></p>
                 </div>
 
-                <div class="setup-row">
-                    <div class="setup-box">
-                        <h4>Mailadress</h4>
-                        <p>Mottagare vid "Skicka resultat"</p>
+                <div class="section-box">
+                    <h4>Mailadress</h4>
+                    <p>Ange den mailadress som resultat ska skickas till. När du trycker "Skicka resultat" i en tävlingsform laddas CSV- och PDF-filer ner, och ett mail öppnas automatiskt till denna adress.</p>
+                    <p>Lämna tomt om du inte vill att mail ska öppnas automatiskt.</p>
+                    <div class="section-action">
                         <input type="email" id="emailSetting" placeholder="namn@example.com" onchange="saveEmail()">
                     </div>
+                </div>
 
-                    <div class="setup-box">
-                        <h4>Logotyp</h4>
-                        <p>Visas i PDF-header (valfritt)</p>
+                <div class="section-box">
+                    <h4>Logotyp</h4>
+                    <p>Ladda upp en logotyp som visas överst i genererade PDF-rapporter. Stöder PNG och JPEG.</p>
+                    <p>Rekommenderad storlek: ca 300–600 px bred. Bilden skalas automatiskt i PDF:en. Om ingen logotyp laddas genereras PDF utan header-bild.</p>
+                    <div class="section-action">
                         <div class="btn-row">
                             <label class="btn-action">
                                 Ladda bild
@@ -341,10 +400,15 @@
                         <div class="setting-status" id="logoStatus"></div>
                         <div id="logoPreview"></div>
                     </div>
+                </div>
 
-                    <div class="setup-box">
-                        <h4>Medlemslista</h4>
-                        <p>CSV-fil med namn för snabbval</p>
+                <div class="section-box">
+                    <h4>Medlemslista</h4>
+                    <p>Ladda en CSV- eller textfil med medlemsnamn för automatiska namnförslag när du fyller i resultat. Börja skriva ett namn så visas matchande förslag.</p>
+                    <p><strong>Format:</strong> En fil med ett namn per rad, t.ex.:</p>
+                    <pre>Anna Andersson\nBjörn Björkman\nCecilia Carlsson</pre>
+                    <p>Filen kan vara .csv eller .txt, med eller utan BOM. Tomma rader ignoreras.</p>
+                    <div class="section-action">
                         <div class="btn-row">
                             <label class="btn-action">
                                 Ladda CSV
