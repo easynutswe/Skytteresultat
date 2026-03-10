@@ -85,7 +85,7 @@
         .station-config-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; background: white; border-radius: 6px; border: 1px solid #e8ecf0; }
         .station-config-item .stn-label { font-size: 12px; font-weight: 600; color: #1a5276; }
         .station-config-item .mal-row { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #5a6778; }
-        .station-config-item .mal-row input[type="number"] { width: 36px; padding: 3px 2px; font-size: 12px; text-align: center; border: 1px solid #d0d5dd; border-radius: 4px; -moz-appearance: textfield; }
+        .station-config-item .mal-row input[type="number"] { width: 36px; padding: 3px 2px; font-size: 12px; text-align: center; border: 1px solid #d0d5dd; border-radius: 4px; -moz-appearance: textfield; cursor: pointer; }
         .station-config-item .mal-row input[type="number"]::-webkit-inner-spin-button,
         .station-config-item .mal-row input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .station-config-item .sar-row { display: flex; align-items: center; gap: 3px; font-size: 11px; color: #5a6778; }
@@ -321,6 +321,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Select all on focus for station config inputs
+            document.querySelectorAll('.station-config-item input[type="number"]').forEach(inp => {
+                inp.addEventListener('focus', function() { this.select(); });
+            });
+
             updateConfigVisuals();
             updateTableHeader();
             addRow();
@@ -652,6 +657,7 @@
             input.placeholder = '0';
             input.style.width = '40px';
             input.dataset.maxVal = maxVal;
+            input.onfocus = (e) => { e.target.select(); };
             input.oninput = (e) => {
                 e.target.value = e.target.value.replace(/[^0-9]/g, '');
                 const max = parseInt(e.target.dataset.maxVal) || 6;
