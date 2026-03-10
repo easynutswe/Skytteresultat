@@ -1150,8 +1150,10 @@
 
             const img = new Image();
             img.onload = function() {
-                const imgWidth = 200;
-                const imgHeight = (this.height / this.width) * imgWidth;
+                const maxHeight = 60;
+                let imgWidth = 200;
+                let imgHeight = (this.height / this.width) * imgWidth;
+                if (imgHeight > maxHeight) { imgWidth *= maxHeight / imgHeight; imgHeight = maxHeight; }
                 const pageW = doc.internal.pageSize.getWidth();
                 const imgX = (pageW - imgWidth) / 2;
 

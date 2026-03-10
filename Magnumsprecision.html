@@ -1052,8 +1052,10 @@
             
             const img = new Image();
             img.onload = function() {
-                const imgWidth = isLandscape ? 200 : 150;
-                const imgHeight = (this.height / this.width) * imgWidth;
+                const maxHeight = 60;
+                let imgWidth = isLandscape ? 200 : 150;
+                let imgHeight = (this.height / this.width) * imgWidth;
+                if (imgHeight > maxHeight) { imgWidth *= maxHeight / imgHeight; imgHeight = maxHeight; }
                 const pageW = doc.internal.pageSize.getWidth();
                 const imgX = (pageW - imgWidth) / 2;
                 
