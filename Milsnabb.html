@@ -18,6 +18,8 @@
         }
         .page-title { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; margin: 0 0 20px 0; letter-spacing: -0.02em; }
         .instructions { background-color: #f8f9fb; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e8ecf0; }
+        .validation-warning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fef3c7; border: 2px solid #f59e0b; color: #92400e; padding: 18px 32px; border-radius: 12px; font-size: 18px; font-weight: 600; z-index: 10000; box-shadow: 0 8px 24px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .validation-warning.show { opacity: 1; }
         .instructions h3 { margin: 0 0 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 600; }
         .instructions p { margin: 4px 0; line-height: 1.5; font-size: 13px; color: #4a5568; }
         .setup-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
@@ -649,6 +651,10 @@
                 if (e.target.value.length > 2) {
                     e.target.value = e.target.value.slice(0, 2);
                 }
+                const val = parseInt(e.target.value);
+                if (val >= 10) {
+                    showWarning(val + ' innertior – stämmer det?');
+                }
             };
             starsInput.onkeydown = (e) => {
                 if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
@@ -694,23 +700,35 @@
             tbody.appendChild(row);
         }
 
+        let warningTimeout;
+        function showWarning(msg) {
+            const el = document.getElementById('validationWarning');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(warningTimeout);
+            warningTimeout = setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
         function validateScore(input) {
             const value = parseInt(input.value);
             input.classList.remove('error', 'perfect-score');
-            
+
             if (input.value === '') {
                 updateTotals(input.closest('tr'));
                 return;
             }
-            
+
             if (isNaN(value) || value < 0 || value > 50) {
                 input.classList.add('error');
                 input.value = '';
-                alert('Error: Score must be between 0 and 50');
+                showWarning('Poäng måste vara mellan 0 och 50');
             } else if (value === 50) {
                 input.classList.add('perfect-score');
+                showWarning('50 poäng registrerat – stämmer det?');
+            } else if (value === 0) {
+                showWarning('0 poäng registrerat – stämmer det?');
             }
-            
+
             updateTotals(input.closest('tr'));
         }
 
@@ -1338,5 +1356,6 @@
 
     </script>
     <div class="autosave-status" id="saveStatus">Sparad</div>
+    <div class="validation-warning" id="validationWarning"></div>
 </body>
 </html>
