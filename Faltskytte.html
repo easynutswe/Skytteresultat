@@ -81,13 +81,16 @@
         .groups-input { width: 200px; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 13px; font-family: inherit; text-align: left; }
         .groups-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
         .score-input { width: 40px; }
-        .station-config-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 6px; }
+        .station-config-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 6px; }
         .station-config-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; background: white; border-radius: 6px; border: 1px solid #e8ecf0; }
         .station-config-item .stn-label { font-size: 12px; font-weight: 600; color: #1a5276; }
         .station-config-item .mal-row { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #5a6778; }
-        .station-config-item .mal-row input[type="number"] { width: 36px; padding: 3px 2px; font-size: 12px; text-align: center; border: 1px solid #d0d5dd; border-radius: 4px; }
+        .station-config-item .mal-row input[type="number"] { width: 36px; padding: 3px 2px; font-size: 12px; text-align: center; border: 1px solid #d0d5dd; border-radius: 4px; -moz-appearance: textfield; }
+        .station-config-item .mal-row input[type="number"]::-webkit-inner-spin-button,
+        .station-config-item .mal-row input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .station-config-item .sar-row { display: flex; align-items: center; gap: 3px; font-size: 11px; color: #5a6778; }
         .station-config-item .sar-row input[type="checkbox"] { width: auto; cursor: pointer; margin: 0; }
+        .station-config-item.inactive { opacity: 0.45; background: #f4f4f4; }
         @media (max-width: 900px) { .setup-row { grid-template-columns: 1fr; } }
 
     </style>
@@ -98,7 +101,7 @@
 
         <div class="instructions">
             <h3>Instruktioner</h3>
-            <p>1. Ställ in antal mål per station och kryssa i vilka stationer som har särskiljning (S)</p>
+            <p>1. Ställ in antal mål per station (0 = inaktiv). Kryssa i stationer med särskiljning (S). Stn 7-8 kan aktiveras vid behov.</p>
             <p>2. Ange vapengrupper som kommaseparerade värden (standard: A,C,R)</p>
             <p>3. Fyll i tävlingsnamn, datum och skjutledare</p>
             <p>4. Lägg till rader och fyll i namn, grupp och stationsvärden (T = Träff, M = Mål, S = Särskiljning)</p>
@@ -112,37 +115,47 @@
         <div class="setup-row">
             <div class="setup-box setup-box--neutral">
                 <h4>Stationsinställningar</h4>
-                <p>Ange max antal mål per station (max träff är alltid 6). Kryssa i stationer med särskiljning.</p>
+                <p>Ange antal mål per station (0 = inaktiv, max träff alltid 6). Stn 7-8 aktiveras genom att sätta mål &gt; 0.</p>
                 <div class="station-config-grid">
-                    <div class="station-config-item">
+                    <div class="station-config-item" id="stnConfig1">
                         <span class="stn-label">Stn 1</span>
-                        <div class="mal-row">Mål <input type="number" id="maxMal1" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="mal-row">Mål <input type="number" id="maxMal1" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn1" onchange="onStationConfigChange()"> Sär</div>
                     </div>
-                    <div class="station-config-item">
+                    <div class="station-config-item" id="stnConfig2">
                         <span class="stn-label">Stn 2</span>
-                        <div class="mal-row">Mål <input type="number" id="maxMal2" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="mal-row">Mål <input type="number" id="maxMal2" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn2" onchange="onStationConfigChange()"> Sär</div>
                     </div>
-                    <div class="station-config-item">
+                    <div class="station-config-item" id="stnConfig3">
                         <span class="stn-label">Stn 3</span>
-                        <div class="mal-row">Mål <input type="number" id="maxMal3" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="mal-row">Mål <input type="number" id="maxMal3" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn3" onchange="onStationConfigChange()"> Sär</div>
                     </div>
-                    <div class="station-config-item">
+                    <div class="station-config-item" id="stnConfig4">
                         <span class="stn-label">Stn 4</span>
-                        <div class="mal-row">Mål <input type="number" id="maxMal4" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="mal-row">Mål <input type="number" id="maxMal4" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn4" onchange="onStationConfigChange()"> Sär</div>
                     </div>
-                    <div class="station-config-item">
+                    <div class="station-config-item" id="stnConfig5">
                         <span class="stn-label">Stn 5</span>
-                        <div class="mal-row">Mål <input type="number" id="maxMal5" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="mal-row">Mål <input type="number" id="maxMal5" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn5" onchange="onStationConfigChange()"> Sär</div>
                     </div>
-                    <div class="station-config-item">
+                    <div class="station-config-item" id="stnConfig6">
                         <span class="stn-label">Stn 6</span>
-                        <div class="mal-row">Mål <input type="number" id="maxMal6" min="1" max="6" value="6" onchange="onStationConfigChange()"></div>
+                        <div class="mal-row">Mål <input type="number" id="maxMal6" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn6" onchange="onStationConfigChange()"> Sär</div>
+                    </div>
+                    <div class="station-config-item inactive" id="stnConfig7">
+                        <span class="stn-label">Stn 7</span>
+                        <div class="mal-row">Mål <input type="number" id="maxMal7" min="0" max="6" value="0" onchange="onStationConfigChange()"></div>
+                        <div class="sar-row"><input type="checkbox" id="sarStn7" onchange="onStationConfigChange()"> Sär</div>
+                    </div>
+                    <div class="station-config-item inactive" id="stnConfig8">
+                        <span class="stn-label">Stn 8</span>
+                        <div class="mal-row">Mål <input type="number" id="maxMal8" min="0" max="6" value="0" onchange="onStationConfigChange()"></div>
+                        <div class="sar-row"><input type="checkbox" id="sarStn8" onchange="onStationConfigChange()"> Sär</div>
                     </div>
                 </div>
             </div>
@@ -210,19 +223,33 @@
     <div class="modal-backdrop" onclick="closeModal()"></div>
 
     <script>
-        const NUM_STATIONS = 6;
+        const NUM_STATIONS = 8;
         let preloadedMembers = [];
         let customLogoDataUrl = null;
 
         function getMaxMal(stationIndex) {
-            const val = parseInt(document.getElementById('maxMal' + (stationIndex + 1)).value);
-            return (val >= 1 && val <= 6) ? val : 6;
+            const el = document.getElementById('maxMal' + (stationIndex + 1));
+            if (!el) return 0;
+            const val = parseInt(el.value);
+            return (val >= 0 && val <= 6) ? val : 0;
         }
 
         function getMaxMalAll() {
             const result = [];
             for (let i = 0; i < NUM_STATIONS; i++) {
                 result.push(getMaxMal(i));
+            }
+            return result;
+        }
+
+        function isStationActive(stationIndex) {
+            return getMaxMal(stationIndex) > 0;
+        }
+
+        function getActiveStations() {
+            const result = [];
+            for (let i = 0; i < NUM_STATIONS; i++) {
+                if (isStationActive(i)) result.push(i);
             }
             return result;
         }
@@ -236,7 +263,17 @@
         }
 
         function anySar() {
-            return getSarStations().some(v => v);
+            const sar = getSarStations();
+            return getActiveStations().some(i => sar[i]);
+        }
+
+        function updateConfigVisuals() {
+            for (let i = 1; i <= NUM_STATIONS; i++) {
+                const el = document.getElementById('stnConfig' + i);
+                if (el) {
+                    el.classList.toggle('inactive', getMaxMal(i - 1) === 0);
+                }
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -460,38 +497,33 @@
         }
 
         function onStationConfigChange() {
-            // Clamp max mål inputs to 1-6
+            // Clamp max mål inputs to 0-6
             for (let i = 1; i <= NUM_STATIONS; i++) {
                 const el = document.getElementById('maxMal' + i);
                 let v = parseInt(el.value);
-                if (isNaN(v) || v < 1) v = 1;
+                if (isNaN(v) || v < 0) v = 0;
                 if (v > 6) v = 6;
                 el.value = v;
             }
+            updateConfigVisuals();
 
-            // Save current row data, rebuild table, restore data
+            // Save current row data keyed by station index, rebuild table, restore
             const tbody = document.getElementById('resultsBody');
             const rows = Array.from(tbody.rows);
             const savedData = rows.map(row => {
                 const name = row.querySelector('.name') ? row.querySelector('.name').value : '';
                 const group = row.querySelector('.group') ? row.querySelector('.group').value : '';
-                const tInputs = Array.from(row.querySelectorAll('.stn-t'));
-                const mInputs = Array.from(row.querySelectorAll('.stn-m'));
-                const sInputs = Array.from(row.querySelectorAll('.stn-s'));
-                const stations = [];
-                for (let s = 0; s < NUM_STATIONS; s++) {
-                    stations.push({
-                        t: tInputs[s] ? tInputs[s].value : '',
-                        m: mInputs[s] ? mInputs[s].value : '',
-                        s: sInputs[s] ? sInputs[s].value : ''
-                    });
-                }
+                const stations = {};
+                row.querySelectorAll('.stn-t').forEach(inp => { stations[inp.dataset.station] = stations[inp.dataset.station] || {}; stations[inp.dataset.station].t = inp.value; });
+                row.querySelectorAll('.stn-m').forEach(inp => { stations[inp.dataset.station] = stations[inp.dataset.station] || {}; stations[inp.dataset.station].m = inp.value; });
+                row.querySelectorAll('.stn-s').forEach(inp => { stations[inp.dataset.station] = stations[inp.dataset.station] || {}; stations[inp.dataset.station].s = inp.value; });
                 return { name, group, stations };
             });
 
             updateTableHeader();
             tbody.innerHTML = '';
 
+            const newActive = getActiveStations();
             savedData.forEach(data => {
                 addRow();
                 const row = tbody.lastElementChild;
@@ -507,20 +539,23 @@
                     }
                     groupSel.value = data.group;
                 }
-                const tInputs = row.querySelectorAll('.stn-t');
-                const mInputs = row.querySelectorAll('.stn-m');
-                const sInputs = row.querySelectorAll('.stn-s');
-                for (let s = 0; s < NUM_STATIONS; s++) {
-                    if (tInputs[s]) tInputs[s].value = data.stations[s].t;
-                    if (mInputs[s]) {
-                        // Clamp restored mål value to new max
+                row.querySelectorAll('.stn-t').forEach(inp => {
+                    const s = inp.dataset.station;
+                    if (data.stations[s]) inp.value = data.stations[s].t || '';
+                });
+                row.querySelectorAll('.stn-m').forEach(inp => {
+                    const s = inp.dataset.station;
+                    if (data.stations[s]) {
                         let mVal = parseInt(data.stations[s].m) || 0;
-                        const maxM = getMaxMal(s);
+                        const maxM = getMaxMal(parseInt(s));
                         if (mVal > maxM) mVal = maxM;
-                        mInputs[s].value = mVal || data.stations[s].m;
+                        inp.value = mVal || data.stations[s].m;
                     }
-                    if (sInputs[s]) sInputs[s].value = data.stations[s].s;
-                }
+                });
+                row.querySelectorAll('.stn-s').forEach(inp => {
+                    const s = inp.dataset.station;
+                    if (data.stations[s]) inp.value = data.stations[s].s || '';
+                });
                 updateTotals(row);
             });
         }
@@ -530,14 +565,15 @@
             const headerSub = document.getElementById('tableHeaderSub');
             const sarStations = getSarStations();
             const maxMals = getMaxMalAll();
+            const active = getActiveStations();
 
             let topHtml = '<th rowspan="2" style="min-width: 200px;">Namn</th>';
             topHtml += '<th rowspan="2" style="min-width: 80px;">Grupp</th>';
-            for (let i = 0; i < NUM_STATIONS; i++) {
+            active.forEach(i => {
                 const cols = sarStations[i] ? 3 : 2;
                 const cls = sarStations[i] ? 'station-header-sar' : 'station-header';
                 topHtml += `<th colspan="${cols}" class="${cls}">Stn ${i + 1} (${maxMals[i]})</th>`;
-            }
+            });
             topHtml += '<th rowspan="2" class="total-col">Träff</th>';
             topHtml += '<th rowspan="2" class="total-col">Mål</th>';
             topHtml += '<th rowspan="2" class="total-col">Poäng</th>';
@@ -547,12 +583,12 @@
             headerTop.innerHTML = topHtml;
 
             let subHtml = '';
-            for (let i = 0; i < NUM_STATIONS; i++) {
+            active.forEach(i => {
                 subHtml += '<th>T</th><th>M</th>';
                 if (sarStations[i]) {
                     subHtml += '<th>S</th>';
                 }
-            }
+            });
             headerSub.innerHTML = subHtml;
         }
 
@@ -627,24 +663,31 @@
             groupTd.appendChild(groupSelect);
             row.appendChild(groupTd);
 
-            // Station inputs
-            for (let s = 0; s < NUM_STATIONS; s++) {
+            // Station inputs (only active stations)
+            const active = getActiveStations();
+            active.forEach(s => {
                 const maxM = getMaxMal(s);
                 // Träff (always max 6)
                 const tTd = document.createElement('td');
-                tTd.appendChild(createScoreInput('stn-t', 6));
+                const tInput = createScoreInput('stn-t', 6);
+                tInput.dataset.station = s;
+                tTd.appendChild(tInput);
                 row.appendChild(tTd);
                 // Mål (max per station config)
                 const mTd = document.createElement('td');
-                mTd.appendChild(createScoreInput('stn-m', maxM));
+                const mInput = createScoreInput('stn-m', maxM);
+                mInput.dataset.station = s;
+                mTd.appendChild(mInput);
                 row.appendChild(mTd);
                 // Särskiljning (only if enabled, max 6)
                 if (sarStations[s]) {
                     const sTd = document.createElement('td');
-                    sTd.appendChild(createScoreInput('stn-s', 6));
+                    const sInput = createScoreInput('stn-s', 6);
+                    sInput.dataset.station = s;
+                    sTd.appendChild(sInput);
                     row.appendChild(sTd);
                 }
-            }
+            });
 
             // Träff total
             const totTTd = document.createElement('td');
@@ -751,26 +794,24 @@
         function getRowData(row) {
             const name = row.querySelector('.name').value;
             const group = row.querySelector('.group').value;
-            const sarStations = getSarStations();
 
-            const tInputs = Array.from(row.querySelectorAll('.stn-t'));
-            const mInputs = Array.from(row.querySelectorAll('.stn-m'));
-            const sInputs = Array.from(row.querySelectorAll('.stn-s'));
-
-            let sIdx = 0;
+            // Build station data array (all NUM_STATIONS slots, zeros for inactive)
             const stations = [];
             for (let s = 0; s < NUM_STATIONS; s++) {
-                const stn = {
-                    t: parseInt(tInputs[s] ? tInputs[s].value : 0) || 0,
-                    m: parseInt(mInputs[s] ? mInputs[s].value : 0) || 0,
-                    s: 0
-                };
-                if (sarStations[s] && sInputs[sIdx]) {
-                    stn.s = parseInt(sInputs[sIdx].value) || 0;
-                    sIdx++;
-                }
-                stations.push(stn);
+                stations.push({ t: 0, m: 0, s: 0 });
             }
+            row.querySelectorAll('.stn-t').forEach(inp => {
+                const s = parseInt(inp.dataset.station);
+                stations[s].t = parseInt(inp.value) || 0;
+            });
+            row.querySelectorAll('.stn-m').forEach(inp => {
+                const s = parseInt(inp.dataset.station);
+                stations[s].m = parseInt(inp.value) || 0;
+            });
+            row.querySelectorAll('.stn-s').forEach(inp => {
+                const s = parseInt(inp.dataset.station);
+                stations[s].s = parseInt(inp.value) || 0;
+            });
 
             let totalT = 0, totalM = 0, totalS = 0;
             stations.forEach(stn => {
@@ -899,10 +940,11 @@
                         const malValues = metaParts[6].split(',');
                         for (let i = 0; i < NUM_STATIONS; i++) {
                             const v = parseInt(malValues[i]);
-                            document.getElementById('maxMal' + (i + 1)).value = (v >= 1 && v <= 6) ? v : 6;
+                            document.getElementById('maxMal' + (i + 1)).value = (!isNaN(v) && v >= 0 && v <= 6) ? v : (i < 6 ? 1 : 0);
                         }
                     }
 
+                    updateConfigVisuals();
                     updateTableHeader();
                 } else if (metaParts.length >= 4) {
                     document.getElementById('competitionTitle').value = metaParts[0];
@@ -936,19 +978,19 @@
                         }
                         groupSel.value = group;
 
-                        // Station data: always 3 values per station (T, M, S)
-                        const tInputs = row.querySelectorAll('.stn-t');
-                        const mInputs = row.querySelectorAll('.stn-m');
-                        const sInputs = row.querySelectorAll('.stn-s');
-                        let sIdx = 0;
+                        // Station data: always 3 values per station (T, M, S) in CSV
+                        // Map by station index via data-station attribute
                         for (let s = 0; s < NUM_STATIONS; s++) {
                             const idx = s * 3 + 2;
-                            if (tInputs[s]) tInputs[s].value = parts[idx] || '0';
-                            if (mInputs[s]) mInputs[s].value = parts[idx + 1] || '0';
-                            if (sarStations[s] && sInputs[sIdx]) {
-                                sInputs[sIdx].value = parts[idx + 2] || '0';
-                                sIdx++;
-                            }
+                            const tVal = parts[idx] || '0';
+                            const mVal = parts[idx + 1] || '0';
+                            const sVal = parts[idx + 2] || '0';
+                            const tInp = row.querySelector(`.stn-t[data-station="${s}"]`);
+                            const mInp = row.querySelector(`.stn-m[data-station="${s}"]`);
+                            const sInp = row.querySelector(`.stn-s[data-station="${s}"]`);
+                            if (tInp) tInp.value = tVal;
+                            if (mInp) mInp.value = mVal;
+                            if (sInp) sInp.value = sVal;
                         }
 
                         updateTotals(row);
@@ -1112,7 +1154,8 @@
             doc.setTextColor(0, 0, 0);
             doc.setLineWidth(0.5);
 
-            // Build column positions dynamically - Milsnabb-style grouped layout
+            // Build column positions dynamically - only active stations
+            const active = getActiveStations();
             const colW = 9;
             const stnStart = tableX + 78;
 
@@ -1120,11 +1163,11 @@
                 place: tableX + 2,
                 name: tableX + 12,
                 group: tableX + 68,
-                stations: []
+                stations: {} // keyed by station index
             };
 
             let xPos = stnStart;
-            for (let s = 0; s < NUM_STATIONS; s++) {
+            active.forEach(s => {
                 const stn = { start: xPos, t: xPos, m: xPos + colW };
                 if (sarStations[s]) {
                     stn.s = xPos + colW * 2;
@@ -1132,8 +1175,8 @@
                 } else {
                     xPos += colW * 2 + 3;
                 }
-                colPos.stations.push(stn);
-            }
+                colPos.stations[s] = stn;
+            });
 
             xPos += 2;
             colPos.totalT = xPos;
@@ -1150,14 +1193,14 @@
             doc.text('Namn', colPos.name, y);
             doc.text('Grp', colPos.group, y);
 
-            for (let s = 0; s < NUM_STATIONS; s++) {
+            active.forEach(s => {
                 const stn = colPos.stations[s];
                 const stnCols = sarStations[s] ? 3 : 2;
                 const stnWidth = stnCols * colW;
                 const label = `Stn ${s + 1} (${maxMals[s]})`;
                 const labelW = doc.getTextWidth(label);
                 doc.text(label, stn.start + (stnWidth - labelW) / 2, y);
-            }
+            });
 
             doc.text('Träff', colPos.totalT, y);
             doc.text('Mål', colPos.totalM, y);
@@ -1171,13 +1214,13 @@
 
             // === HEADER ROW 2: Sub-column labels (T, M, S) ===
             doc.setFontSize(8);
-            for (let s = 0; s < NUM_STATIONS; s++) {
+            active.forEach(s => {
                 doc.text('T', colPos.stations[s].t, y);
                 doc.text('M', colPos.stations[s].m, y);
                 if (sarStations[s]) {
                     doc.text('S', colPos.stations[s].s, y);
                 }
-            }
+            });
 
             doc.line(tableX, y + 3, tableX + tableW, y + 3);
             y += 10;
@@ -1213,7 +1256,8 @@
                     doc.text(result.name, colPos.name, y);
                     doc.text(result.group, colPos.group, y);
 
-                    result.stations.forEach((stn, s) => {
+                    active.forEach(s => {
+                        const stn = result.stations[s];
                         doc.setFont('helvetica', 'normal');
                         doc.text(stn.t.toString(), colPos.stations[s].t, y);
                         doc.text(stn.m.toString(), colPos.stations[s].m, y);
@@ -1317,8 +1361,8 @@
                 // Restore max mål config
                 if (data.maxMals && Array.isArray(data.maxMals)) {
                     for (let i = 0; i < NUM_STATIONS; i++) {
-                        const v = data.maxMals[i];
-                        document.getElementById('maxMal' + (i + 1)).value = (v >= 1 && v <= 6) ? v : 6;
+                        const v = data.maxMals[i] !== undefined ? data.maxMals[i] : (i < 6 ? 1 : 0);
+                        document.getElementById('maxMal' + (i + 1)).value = (v >= 0 && v <= 6) ? v : 0;
                     }
                 }
 
@@ -1333,6 +1377,7 @@
                     }
                 }
 
+                updateConfigVisuals();
                 updateTableHeader();
 
                 const tbody = document.getElementById('resultsBody');
@@ -1362,8 +1407,9 @@
             document.getElementById('groupsConfig').value = 'A,C,R';
             for (let i = 1; i <= NUM_STATIONS; i++) {
                 document.getElementById('sarStn' + i).checked = false;
-                document.getElementById('maxMal' + i).value = 6;
+                document.getElementById('maxMal' + i).value = (i <= 6) ? 1 : 0;
             }
+            updateConfigVisuals();
             updateTableHeader();
             addRow(); addRow();
         }
