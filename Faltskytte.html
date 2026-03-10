@@ -90,6 +90,13 @@
         .station-config-item .mal-row input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .station-config-item .sar-row { display: flex; align-items: center; gap: 3px; font-size: 11px; color: #5a6778; }
         .station-config-item .sar-row input[type="checkbox"] { width: auto; cursor: pointer; margin: 0; }
+        .station-config-item .sar-max { display: none; align-items: center; gap: 4px; font-size: 11px; color: #5a6778; }
+        .station-config-item .sar-max.visible { display: flex; }
+        .station-config-item .sar-max input[type="number"] { width: 36px; padding: 3px 2px; font-size: 12px; text-align: center; border: 1px solid #d0d5dd; border-radius: 4px; -moz-appearance: textfield; }
+        .station-config-item .sar-max input[type="number"]::-webkit-inner-spin-button,
+        .station-config-item .sar-max input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .validation-warning { position: fixed; top: 20px; right: 20px; background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 10px 16px; border-radius: 8px; font-size: 13px; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .validation-warning.show { opacity: 1; }
         .station-config-item.inactive { opacity: 0.45; background: #f4f4f4; }
         @media (max-width: 900px) { .setup-row { grid-template-columns: 1fr; } }
 
@@ -121,41 +128,49 @@
                         <span class="stn-label">Stn 1</span>
                         <div class="mal-row">Mål <input type="number" id="maxMal1" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn1" onchange="onStationConfigChange()"> Sär</div>
+                        <div class="sar-max" id="sarMax1Row">Max S <input type="number" id="maxSar1" min="1" max="30" value="6" onchange="onStationConfigChange()"></div>
                     </div>
                     <div class="station-config-item" id="stnConfig2">
                         <span class="stn-label">Stn 2</span>
                         <div class="mal-row">Mål <input type="number" id="maxMal2" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn2" onchange="onStationConfigChange()"> Sär</div>
+                        <div class="sar-max" id="sarMax2Row">Max S <input type="number" id="maxSar2" min="1" max="30" value="6" onchange="onStationConfigChange()"></div>
                     </div>
                     <div class="station-config-item" id="stnConfig3">
                         <span class="stn-label">Stn 3</span>
                         <div class="mal-row">Mål <input type="number" id="maxMal3" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn3" onchange="onStationConfigChange()"> Sär</div>
+                        <div class="sar-max" id="sarMax3Row">Max S <input type="number" id="maxSar3" min="1" max="30" value="6" onchange="onStationConfigChange()"></div>
                     </div>
                     <div class="station-config-item" id="stnConfig4">
                         <span class="stn-label">Stn 4</span>
                         <div class="mal-row">Mål <input type="number" id="maxMal4" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn4" onchange="onStationConfigChange()"> Sär</div>
+                        <div class="sar-max" id="sarMax4Row">Max S <input type="number" id="maxSar4" min="1" max="30" value="6" onchange="onStationConfigChange()"></div>
                     </div>
                     <div class="station-config-item" id="stnConfig5">
                         <span class="stn-label">Stn 5</span>
                         <div class="mal-row">Mål <input type="number" id="maxMal5" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn5" onchange="onStationConfigChange()"> Sär</div>
+                        <div class="sar-max" id="sarMax5Row">Max S <input type="number" id="maxSar5" min="1" max="30" value="6" onchange="onStationConfigChange()"></div>
                     </div>
                     <div class="station-config-item" id="stnConfig6">
                         <span class="stn-label">Stn 6</span>
                         <div class="mal-row">Mål <input type="number" id="maxMal6" min="0" max="6" value="1" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn6" onchange="onStationConfigChange()"> Sär</div>
+                        <div class="sar-max" id="sarMax6Row">Max S <input type="number" id="maxSar6" min="1" max="30" value="6" onchange="onStationConfigChange()"></div>
                     </div>
                     <div class="station-config-item inactive" id="stnConfig7">
                         <span class="stn-label">Stn 7</span>
                         <div class="mal-row">Mål <input type="number" id="maxMal7" min="0" max="6" value="0" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn7" onchange="onStationConfigChange()"> Sär</div>
+                        <div class="sar-max" id="sarMax7Row">Max S <input type="number" id="maxSar7" min="1" max="30" value="6" onchange="onStationConfigChange()"></div>
                     </div>
                     <div class="station-config-item inactive" id="stnConfig8">
                         <span class="stn-label">Stn 8</span>
                         <div class="mal-row">Mål <input type="number" id="maxMal8" min="0" max="6" value="0" onchange="onStationConfigChange()"></div>
                         <div class="sar-row"><input type="checkbox" id="sarStn8" onchange="onStationConfigChange()"> Sär</div>
+                        <div class="sar-max" id="sarMax8Row">Max S <input type="number" id="maxSar8" min="1" max="30" value="6" onchange="onStationConfigChange()"></div>
                     </div>
                 </div>
             </div>
@@ -267,16 +282,46 @@
             return getActiveStations().some(i => sar[i]);
         }
 
+        function getMaxSar(stationIndex) {
+            const el = document.getElementById('maxSar' + (stationIndex + 1));
+            if (!el) return 6;
+            const val = parseInt(el.value);
+            return (val >= 1 && val <= 30) ? val : 6;
+        }
+
+        function getMaxSarAll() {
+            const result = [];
+            for (let i = 0; i < NUM_STATIONS; i++) {
+                result.push(getMaxSar(i));
+            }
+            return result;
+        }
+
+        let warningTimeout = null;
+        function showWarning(msg) {
+            const el = document.getElementById('validationWarning');
+            el.textContent = msg;
+            el.classList.add('show');
+            if (warningTimeout) clearTimeout(warningTimeout);
+            warningTimeout = setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
         function updateConfigVisuals() {
+            const sarStations = getSarStations();
             for (let i = 1; i <= NUM_STATIONS; i++) {
                 const el = document.getElementById('stnConfig' + i);
                 if (el) {
                     el.classList.toggle('inactive', getMaxMal(i - 1) === 0);
                 }
+                const sarMaxRow = document.getElementById('sarMax' + i + 'Row');
+                if (sarMaxRow) {
+                    sarMaxRow.classList.toggle('visible', sarStations[i - 1]);
+                }
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            updateConfigVisuals();
             updateTableHeader();
             addRow();
             addRow();
@@ -504,6 +549,12 @@
                 if (isNaN(v) || v < 0) v = 0;
                 if (v > 6) v = 6;
                 el.value = v;
+                // Clamp max sär inputs to 1-30
+                const sarEl = document.getElementById('maxSar' + i);
+                let sv = parseInt(sarEl.value);
+                if (isNaN(sv) || sv < 1) sv = 1;
+                if (sv > 30) sv = 30;
+                sarEl.value = sv;
             }
             updateConfigVisuals();
 
@@ -603,11 +654,15 @@
             input.dataset.maxVal = maxVal;
             input.oninput = (e) => {
                 e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                if (e.target.value.length > 1) {
-                    e.target.value = e.target.value.slice(0, 1);
-                }
                 const max = parseInt(e.target.dataset.maxVal) || 6;
                 if (e.target.value !== '' && parseInt(e.target.value) > max) {
+                    const stnIdx = parseInt(e.target.dataset.station);
+                    const stnLabel = !isNaN(stnIdx) ? `Stn ${stnIdx + 1}` : '';
+                    let typeLabel = '';
+                    if (e.target.classList.contains('stn-t')) typeLabel = 'Träff';
+                    else if (e.target.classList.contains('stn-m')) typeLabel = 'Mål';
+                    else if (e.target.classList.contains('stn-s')) typeLabel = 'Särskiljning';
+                    showWarning(`${stnLabel} ${typeLabel}: Max ${max}, du angav ${e.target.value}`);
                     e.target.value = String(max);
                 }
                 updateTotals(e.target.closest('tr'));
@@ -679,10 +734,10 @@
                 mInput.dataset.station = s;
                 mTd.appendChild(mInput);
                 row.appendChild(mTd);
-                // Särskiljning (only if enabled, max 6)
+                // Särskiljning (only if enabled, max per config)
                 if (sarStations[s]) {
                     const sTd = document.createElement('td');
-                    const sInput = createScoreInput('stn-s', 6);
+                    const sInput = createScoreInput('stn-s', getMaxSar(s));
                     sInput.dataset.station = s;
                     sTd.appendChild(sInput);
                     row.appendChild(sTd);
@@ -875,11 +930,13 @@
             const sarConfig = sarStations.map(v => v ? '1' : '0').join(',');
             const maxMals = getMaxMalAll();
             const malConfig = maxMals.join(',');
+            const maxSars = getMaxSarAll();
+            const sarMaxConfig = maxSars.join(',');
             const rows = Array.from(document.getElementById('resultsBody').getElementsByTagName('tr'));
 
             let csv = '\uFEFF';
-            // Metadata: title;date;leader;freeText;sarConfig;groupsConfig;malConfig
-            csv += `${competitionTitle};${date};${leader};${freeText.replace(/\n/g, '\\n')};${sarConfig};${groupsConfig};${malConfig}\n`;
+            // Metadata: title;date;leader;freeText;sarConfig;groupsConfig;malConfig;sarMaxConfig
+            csv += `${competitionTitle};${date};${leader};${freeText.replace(/\n/g, '\\n')};${sarConfig};${groupsConfig};${malConfig};${sarMaxConfig}\n`;
 
             rows.forEach(row => {
                 const data = getRowData(row);
@@ -941,6 +998,15 @@
                         for (let i = 0; i < NUM_STATIONS; i++) {
                             const v = parseInt(malValues[i]);
                             document.getElementById('maxMal' + (i + 1)).value = (!isNaN(v) && v >= 0 && v <= 6) ? v : (i < 6 ? 1 : 0);
+                        }
+                    }
+
+                    // Restore max sär config if present
+                    if (metaParts.length >= 8) {
+                        const sarMaxValues = metaParts[7].split(',');
+                        for (let i = 0; i < NUM_STATIONS; i++) {
+                            const v = parseInt(sarMaxValues[i]);
+                            document.getElementById('maxSar' + (i + 1)).value = (!isNaN(v) && v >= 1 && v <= 30) ? v : 6;
                         }
                     }
 
@@ -1156,8 +1222,12 @@
 
             // Build column positions dynamically - only active stations
             const active = getActiveStations();
-            const colW = 9;
+            const activeSarCount = active.filter(s => sarStations[s]).length;
+            const totalSubCols = active.length * 2 + activeSarCount; // T+M per active + S for sar
             const stnStart = tableX + 78;
+            const sumColsWidth = hasSarAny ? 60 : 45;
+            const availableForStations = tableW - 78 - sumColsWidth - active.length * 2; // gaps
+            const colW = Math.min(9, Math.floor(availableForStations / totalSubCols));
 
             const colPos = {
                 place: tableX + 2,
@@ -1320,6 +1390,7 @@
             try {
                 const sarStations = getSarStations();
                 const maxMals = getMaxMalAll();
+                const maxSars = getMaxSarAll();
                 const data = {
                     title: document.getElementById('competitionTitle').value,
                     date: document.getElementById('date').value,
@@ -1327,6 +1398,7 @@
                     freeText: document.getElementById('freeText').value,
                     sarStations: sarStations,
                     maxMals: maxMals,
+                    maxSars: maxSars,
                     groupsConfig: document.getElementById('groupsConfig').value,
                     rows: []
                 };
@@ -1363,6 +1435,14 @@
                     for (let i = 0; i < NUM_STATIONS; i++) {
                         const v = data.maxMals[i] !== undefined ? data.maxMals[i] : (i < 6 ? 1 : 0);
                         document.getElementById('maxMal' + (i + 1)).value = (v >= 0 && v <= 6) ? v : 0;
+                    }
+                }
+
+                // Restore max sär config
+                if (data.maxSars && Array.isArray(data.maxSars)) {
+                    for (let i = 0; i < NUM_STATIONS; i++) {
+                        const v = data.maxSars[i] !== undefined ? data.maxSars[i] : 6;
+                        document.getElementById('maxSar' + (i + 1)).value = (v >= 1 && v <= 30) ? v : 6;
                     }
                 }
 
@@ -1408,6 +1488,7 @@
             for (let i = 1; i <= NUM_STATIONS; i++) {
                 document.getElementById('sarStn' + i).checked = false;
                 document.getElementById('maxMal' + i).value = (i <= 6) ? 1 : 0;
+                document.getElementById('maxSar' + i).value = 6;
             }
             updateConfigVisuals();
             updateTableHeader();
@@ -1422,5 +1503,6 @@
 
     </script>
     <div class="autosave-status" id="saveStatus">Sparad</div>
+    <div class="validation-warning" id="validationWarning"></div>
 </body>
 </html>
