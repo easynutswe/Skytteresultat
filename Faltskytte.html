@@ -20,7 +20,7 @@
         .instructions { background-color: #f8f9fb; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e8ecf0; }
         .instructions h3 { margin: 0 0 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 600; }
         .instructions p { margin: 4px 0; line-height: 1.5; font-size: 13px; color: #4a5568; }
-        .setup-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .setup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .setup-box { background-color: #f0f7ff; padding: 14px 16px; border-radius: 8px; border: 1px solid #c7ddf5; }
         .setup-box h4 { margin: 0 0 6px 0; color: #1a5276; font-size: 13px; font-weight: 600; }
         .setup-box p { margin: 0 0 6px 0; font-size: 12px; color: #5a6778; }
@@ -68,6 +68,7 @@
         .total-col { background-color: #ecfdf5 !important; font-weight: 700; color: #065f46; }
         .summary-col { background-color: #f8fafc !important; font-weight: 600; color: #334155; }
         .station-header { background-color: #f1f5f9 !important; }
+        .station-header-sar { background-color: #fef3c7 !important; }
         .error { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
         #submitModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 24px; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); z-index: 1000; max-width: 500px; width: 90%; }
         #submitModal h3 { margin: 0 0 12px 0; font-size: 1.1rem; }
@@ -80,6 +81,9 @@
         .groups-input { width: 200px; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 13px; font-family: inherit; text-align: left; }
         .groups-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
         .score-input { width: 40px; }
+        .sar-checkboxes { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+        .sar-checkboxes label { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; cursor: pointer; margin: 0; }
+        .sar-checkboxes input[type="checkbox"] { width: auto; cursor: pointer; }
         @media (max-width: 900px) { .setup-row { grid-template-columns: 1fr; } }
 
     </style>
@@ -90,10 +94,10 @@
 
         <div class="instructions">
             <h3>Instruktioner</h3>
-            <p>1. Välj format: "Träff / Mål" (2 värden per station, t.ex. Skinksmällen/Mörkerfälten) eller "Träff / Figur / Särskiljning" (3 värden per station, t.ex. Fältskjutning KM)</p>
+            <p>1. Välj vilka stationer som har särskiljningskolumn (S) genom att kryssa i rutorna nedan</p>
             <p>2. Ange vapengrupper som kommaseparerade värden (standard: A,C,R)</p>
             <p>3. Fyll i tävlingsnamn, datum och skjutledare</p>
-            <p>4. Lägg till rader och fyll i namn, grupp och stationsvärden</p>
+            <p>4. Lägg till rader och fyll i namn, grupp och stationsvärden (T = Träff, F = Figur, S = Särskiljning)</p>
             <p>5. Tryck "Beräkna &amp; Sortera" för att summera och sortera efter grupp/poäng</p>
             <p>6. Använd "Skicka resultat" för att spara CSV + PDF och förbereda mail</p>
             <p>7. Spara gärna en digital kopia (Spara CSV) som du kan ladda upp (Ladda CSV) för att editera om du fyllt i något resultat fel och skicka in på nytt.</p>
@@ -103,9 +107,16 @@
 
         <div class="setup-row">
             <div class="setup-box setup-box--neutral">
-                <h4>Välj format</h4>
-                <label><input type="radio" name="fieldMode" value="2" checked onchange="changeMode(2)"> Träff / Mål (2 värden per station)</label><br>
-                <label><input type="radio" name="fieldMode" value="3" onchange="changeMode(3)"> Träff / Figur / Särskiljning (3 värden per station)</label>
+                <h4>Särskiljning per station</h4>
+                <p>Kryssa i vilka stationer som har särskiljningskolumn (S)</p>
+                <div class="sar-checkboxes">
+                    <label><input type="checkbox" id="sarStn1" onchange="onSarConfigChange()"> Stn 1</label>
+                    <label><input type="checkbox" id="sarStn2" onchange="onSarConfigChange()"> Stn 2</label>
+                    <label><input type="checkbox" id="sarStn3" onchange="onSarConfigChange()"> Stn 3</label>
+                    <label><input type="checkbox" id="sarStn4" onchange="onSarConfigChange()"> Stn 4</label>
+                    <label><input type="checkbox" id="sarStn5" onchange="onSarConfigChange()"> Stn 5</label>
+                    <label><input type="checkbox" id="sarStn6" onchange="onSarConfigChange()"> Stn 6</label>
+                </div>
             </div>
             <div class="setup-box">
                 <h4>Vapengrupper</h4>
@@ -171,10 +182,25 @@
     <div class="modal-backdrop" onclick="closeModal()"></div>
 
     <script>
-        let currentMode = 2; // 2 = Träff/Mål, 3 = Träff/Figur/Särskiljning
         const NUM_STATIONS = 6;
         let preloadedMembers = [];
         let customLogoDataUrl = null;
+
+        function getSarStations() {
+            const result = [];
+            for (let i = 1; i <= NUM_STATIONS; i++) {
+                result.push(document.getElementById('sarStn' + i).checked);
+            }
+            return result;
+        }
+
+        function hasSar(stationIndex) {
+            return document.getElementById('sarStn' + (stationIndex + 1)).checked;
+        }
+
+        function anySar() {
+            return getSarStations().some(v => v);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             updateTableHeader();
@@ -396,68 +422,85 @@
             }
         }
 
-        function changeMode(mode) {
+        function onSarConfigChange() {
+            // Save current row data, rebuild table, restore data
             const tbody = document.getElementById('resultsBody');
-            const hasData = Array.from(tbody.rows).some(row => {
-                const name = row.querySelector('.name');
-                return name && name.value.trim() !== '';
+            const rows = Array.from(tbody.rows);
+            const savedData = rows.map(row => {
+                const name = row.querySelector('.name') ? row.querySelector('.name').value : '';
+                const group = row.querySelector('.group') ? row.querySelector('.group').value : '';
+                const tInputs = Array.from(row.querySelectorAll('.stn-t'));
+                const fInputs = Array.from(row.querySelectorAll('.stn-f'));
+                const sInputs = Array.from(row.querySelectorAll('.stn-s'));
+                const stations = [];
+                for (let s = 0; s < NUM_STATIONS; s++) {
+                    stations.push({
+                        t: tInputs[s] ? tInputs[s].value : '',
+                        f: fInputs[s] ? fInputs[s].value : '',
+                        s: sInputs[s] ? sInputs[s].value : ''
+                    });
+                }
+                return { name, group, stations };
             });
 
-            if (hasData) {
-                if (!confirm('Att byta format rensar alla befintliga rader. Vill du fortsätta?')) {
-                    // Restore radio button
-                    document.querySelector(`input[name="fieldMode"][value="${currentMode}"]`).checked = true;
-                    return;
-                }
-            }
-
-            currentMode = mode;
             updateTableHeader();
             tbody.innerHTML = '';
-            addRow();
-            addRow();
+
+            savedData.forEach(data => {
+                addRow();
+                const row = tbody.lastElementChild;
+                if (row.querySelector('.name')) row.querySelector('.name').value = data.name;
+                const groupSel = row.querySelector('.group');
+                if (groupSel) {
+                    const existingOpts = Array.from(groupSel.options).map(o => o.value);
+                    if (data.group && !existingOpts.includes(data.group)) {
+                        const opt = document.createElement('option');
+                        opt.value = data.group;
+                        opt.textContent = data.group;
+                        groupSel.appendChild(opt);
+                    }
+                    groupSel.value = data.group;
+                }
+                const tInputs = row.querySelectorAll('.stn-t');
+                const fInputs = row.querySelectorAll('.stn-f');
+                const sInputs = row.querySelectorAll('.stn-s');
+                for (let s = 0; s < NUM_STATIONS; s++) {
+                    if (tInputs[s]) tInputs[s].value = data.stations[s].t;
+                    if (fInputs[s]) fInputs[s].value = data.stations[s].f;
+                    if (sInputs[s]) sInputs[s].value = data.stations[s].s;
+                }
+                updateTotals(row);
+            });
         }
 
         function updateTableHeader() {
             const headerTop = document.getElementById('tableHeaderTop');
             const headerSub = document.getElementById('tableHeaderSub');
+            const sarStations = getSarStations();
 
-            if (currentMode === 2) {
-                // 2-value: Träff / Mål per station
-                let topHtml = '<th rowspan="2" style="min-width: 200px;">Namn</th>';
-                topHtml += '<th rowspan="2" style="min-width: 80px;">Grupp</th>';
-                for (let i = 1; i <= NUM_STATIONS; i++) {
-                    topHtml += `<th colspan="2" class="station-header">Stn ${i}</th>`;
-                }
-                topHtml += '<th rowspan="2" class="total-col">Tot Träff</th>';
-                topHtml += '<th rowspan="2" class="total-col">Tot Mål</th>';
-                topHtml += '<th rowspan="2" class="summary-col">Sär</th>';
-                headerTop.innerHTML = topHtml;
-
-                let subHtml = '';
-                for (let i = 0; i < NUM_STATIONS; i++) {
-                    subHtml += '<th>T</th><th>M</th>';
-                }
-                headerSub.innerHTML = subHtml;
-            } else {
-                // 3-value: Träff / Figur / Särskiljning per station
-                let topHtml = '<th rowspan="2" style="min-width: 200px;">Namn</th>';
-                topHtml += '<th rowspan="2" style="min-width: 80px;">Grupp</th>';
-                for (let i = 1; i <= NUM_STATIONS; i++) {
-                    topHtml += `<th colspan="3" class="station-header">Stn ${i}</th>`;
-                }
-                topHtml += '<th rowspan="2" class="total-col">Träff</th>';
-                topHtml += '<th rowspan="2" class="total-col">Figur</th>';
-                topHtml += '<th rowspan="2" class="total-col">Poäng</th>';
-                topHtml += '<th rowspan="2" class="summary-col">Särp</th>';
-                headerTop.innerHTML = topHtml;
-
-                let subHtml = '';
-                for (let i = 0; i < NUM_STATIONS; i++) {
-                    subHtml += '<th>T</th><th>F</th><th>S</th>';
-                }
-                headerSub.innerHTML = subHtml;
+            let topHtml = '<th rowspan="2" style="min-width: 200px;">Namn</th>';
+            topHtml += '<th rowspan="2" style="min-width: 80px;">Grupp</th>';
+            for (let i = 0; i < NUM_STATIONS; i++) {
+                const cols = sarStations[i] ? 3 : 2;
+                const cls = sarStations[i] ? 'station-header-sar' : 'station-header';
+                topHtml += `<th colspan="${cols}" class="${cls}">Stn ${i + 1}</th>`;
             }
+            topHtml += '<th rowspan="2" class="total-col">Träff</th>';
+            topHtml += '<th rowspan="2" class="total-col">Figur</th>';
+            topHtml += '<th rowspan="2" class="total-col">Poäng</th>';
+            if (anySar()) {
+                topHtml += '<th rowspan="2" class="summary-col">Särp</th>';
+            }
+            headerTop.innerHTML = topHtml;
+
+            let subHtml = '';
+            for (let i = 0; i < NUM_STATIONS; i++) {
+                subHtml += '<th>T</th><th>F</th>';
+                if (sarStations[i]) {
+                    subHtml += '<th>S</th>';
+                }
+            }
+            headerSub.innerHTML = subHtml;
         }
 
         function createScoreInput(className) {
@@ -496,6 +539,7 @@
         function addRow() {
             const tbody = document.getElementById('resultsBody');
             const row = document.createElement('tr');
+            const sarStations = getSarStations();
 
             // Name cell
             const nameTd = document.createElement('td');
@@ -529,71 +573,43 @@
             row.appendChild(groupTd);
 
             // Station inputs
-            if (currentMode === 2) {
-                for (let s = 0; s < NUM_STATIONS; s++) {
-                    // Träff
-                    const tTd = document.createElement('td');
-                    tTd.appendChild(createScoreInput('stn-t'));
-                    row.appendChild(tTd);
-                    // Mål
-                    const mTd = document.createElement('td');
-                    mTd.appendChild(createScoreInput('stn-m'));
-                    row.appendChild(mTd);
-                }
-
-                // Total Träff
-                const totTTd = document.createElement('td');
-                totTTd.className = 'total-traff total-col';
-                totTTd.textContent = '0';
-                row.appendChild(totTTd);
-
-                // Total Mål
-                const totMTd = document.createElement('td');
-                totMTd.className = 'total-mal total-col';
-                totMTd.textContent = '0';
-                row.appendChild(totMTd);
-
-                // Sär
-                const sarTd = document.createElement('td');
-                sarTd.className = 'sar summary-col';
-                sarTd.textContent = '0';
-                row.appendChild(sarTd);
-
-            } else {
-                for (let s = 0; s < NUM_STATIONS; s++) {
-                    // Träff
-                    const tTd = document.createElement('td');
-                    tTd.appendChild(createScoreInput('stn-t'));
-                    row.appendChild(tTd);
-                    // Figur
-                    const fTd = document.createElement('td');
-                    fTd.appendChild(createScoreInput('stn-f'));
-                    row.appendChild(fTd);
-                    // Särskiljning
+            for (let s = 0; s < NUM_STATIONS; s++) {
+                // Träff
+                const tTd = document.createElement('td');
+                tTd.appendChild(createScoreInput('stn-t'));
+                row.appendChild(tTd);
+                // Figur
+                const fTd = document.createElement('td');
+                fTd.appendChild(createScoreInput('stn-f'));
+                row.appendChild(fTd);
+                // Särskiljning (only if enabled for this station)
+                if (sarStations[s]) {
                     const sTd = document.createElement('td');
                     sTd.appendChild(createScoreInput('stn-s'));
                     row.appendChild(sTd);
                 }
+            }
 
-                // Träff total
-                const totTTd = document.createElement('td');
-                totTTd.className = 'total-traff total-col';
-                totTTd.textContent = '0';
-                row.appendChild(totTTd);
+            // Träff total
+            const totTTd = document.createElement('td');
+            totTTd.className = 'total-traff total-col';
+            totTTd.textContent = '0';
+            row.appendChild(totTTd);
 
-                // Figur total
-                const totFTd = document.createElement('td');
-                totFTd.className = 'total-figur total-col';
-                totFTd.textContent = '0';
-                row.appendChild(totFTd);
+            // Figur total
+            const totFTd = document.createElement('td');
+            totFTd.className = 'total-figur total-col';
+            totFTd.textContent = '0';
+            row.appendChild(totFTd);
 
-                // Poäng (Träff + Figur)
-                const poangTd = document.createElement('td');
-                poangTd.className = 'total-poang total-col';
-                poangTd.textContent = '0';
-                row.appendChild(poangTd);
+            // Poäng (Träff + Figur)
+            const poangTd = document.createElement('td');
+            poangTd.className = 'total-poang total-col';
+            poangTd.textContent = '0';
+            row.appendChild(poangTd);
 
-                // Särp
+            // Särp (only if any station has sar)
+            if (anySar()) {
                 const sarpTd = document.createElement('td');
                 sarpTd.className = 'total-sarp summary-col';
                 sarpTd.textContent = '0';
@@ -629,35 +645,22 @@
         function updateTotals(row) {
             if (!row) return;
 
-            if (currentMode === 2) {
-                const tInputs = row.querySelectorAll('.stn-t');
-                const mInputs = row.querySelectorAll('.stn-m');
-                let totalT = 0, totalM = 0;
-                tInputs.forEach(inp => { totalT += parseInt(inp.value) || 0; });
-                mInputs.forEach(inp => { totalM += parseInt(inp.value) || 0; });
-                const totTCell = row.querySelector('.total-traff');
-                const totMCell = row.querySelector('.total-mal');
-                const sarCell = row.querySelector('.sar');
-                if (totTCell) totTCell.textContent = totalT;
-                if (totMCell) totMCell.textContent = totalM;
-                if (sarCell) sarCell.textContent = totalT - totalM;
-            } else {
-                const tInputs = row.querySelectorAll('.stn-t');
-                const fInputs = row.querySelectorAll('.stn-f');
-                const sInputs = row.querySelectorAll('.stn-s');
-                let totalT = 0, totalF = 0, totalS = 0;
-                tInputs.forEach(inp => { totalT += parseInt(inp.value) || 0; });
-                fInputs.forEach(inp => { totalF += parseInt(inp.value) || 0; });
-                sInputs.forEach(inp => { totalS += parseInt(inp.value) || 0; });
-                const totTCell = row.querySelector('.total-traff');
-                const totFCell = row.querySelector('.total-figur');
-                const poangCell = row.querySelector('.total-poang');
-                const sarpCell = row.querySelector('.total-sarp');
-                if (totTCell) totTCell.textContent = totalT;
-                if (totFCell) totFCell.textContent = totalF;
-                if (poangCell) poangCell.textContent = totalT + totalF;
-                if (sarpCell) sarpCell.textContent = totalS;
-            }
+            const tInputs = row.querySelectorAll('.stn-t');
+            const fInputs = row.querySelectorAll('.stn-f');
+            const sInputs = row.querySelectorAll('.stn-s');
+            let totalT = 0, totalF = 0, totalS = 0;
+            tInputs.forEach(inp => { totalT += parseInt(inp.value) || 0; });
+            fInputs.forEach(inp => { totalF += parseInt(inp.value) || 0; });
+            sInputs.forEach(inp => { totalS += parseInt(inp.value) || 0; });
+
+            const totTCell = row.querySelector('.total-traff');
+            const totFCell = row.querySelector('.total-figur');
+            const poangCell = row.querySelector('.total-poang');
+            const sarpCell = row.querySelector('.total-sarp');
+            if (totTCell) totTCell.textContent = totalT;
+            if (totFCell) totFCell.textContent = totalF;
+            if (poangCell) poangCell.textContent = totalT + totalF;
+            if (sarpCell) sarpCell.textContent = totalS;
         }
 
         function validateRowData() {
@@ -692,43 +695,41 @@
         function getRowData(row) {
             const name = row.querySelector('.name').value;
             const group = row.querySelector('.group').value;
+            const sarStations = getSarStations();
 
-            if (currentMode === 2) {
-                const tInputs = Array.from(row.querySelectorAll('.stn-t'));
-                const mInputs = Array.from(row.querySelectorAll('.stn-m'));
-                const totalT = parseInt(row.querySelector('.total-traff').textContent) || 0;
-                const totalM = parseInt(row.querySelector('.total-mal').textContent) || 0;
-                const sar = parseInt(row.querySelector('.sar').textContent) || 0;
-                return {
-                    name, group,
-                    stations: tInputs.map((t, i) => ({
-                        t: parseInt(t.value) || 0,
-                        m: parseInt(mInputs[i].value) || 0
-                    })),
-                    totalT, totalM, sar,
-                    sortValue: totalT,
-                    sortTie: totalM
+            const tInputs = Array.from(row.querySelectorAll('.stn-t'));
+            const fInputs = Array.from(row.querySelectorAll('.stn-f'));
+            const sInputs = Array.from(row.querySelectorAll('.stn-s'));
+
+            let sIdx = 0;
+            const stations = [];
+            for (let s = 0; s < NUM_STATIONS; s++) {
+                const stn = {
+                    t: parseInt(tInputs[s] ? tInputs[s].value : 0) || 0,
+                    f: parseInt(fInputs[s] ? fInputs[s].value : 0) || 0,
+                    s: 0
                 };
-            } else {
-                const tInputs = Array.from(row.querySelectorAll('.stn-t'));
-                const fInputs = Array.from(row.querySelectorAll('.stn-f'));
-                const sInputs = Array.from(row.querySelectorAll('.stn-s'));
-                const totalT = parseInt(row.querySelector('.total-traff').textContent) || 0;
-                const totalF = parseInt(row.querySelector('.total-figur').textContent) || 0;
-                const poang = parseInt(row.querySelector('.total-poang').textContent) || 0;
-                const sarp = parseInt(row.querySelector('.total-sarp').textContent) || 0;
-                return {
-                    name, group,
-                    stations: tInputs.map((t, i) => ({
-                        t: parseInt(t.value) || 0,
-                        f: parseInt(fInputs[i].value) || 0,
-                        s: parseInt(sInputs[i].value) || 0
-                    })),
-                    totalT, totalF, poang, sarp,
-                    sortValue: poang,
-                    sortTie: sarp
-                };
+                if (sarStations[s] && sInputs[sIdx]) {
+                    stn.s = parseInt(sInputs[sIdx].value) || 0;
+                    sIdx++;
+                }
+                stations.push(stn);
             }
+
+            let totalT = 0, totalF = 0, totalS = 0;
+            stations.forEach(stn => {
+                totalT += stn.t;
+                totalF += stn.f;
+                totalS += stn.s;
+            });
+            const poang = totalT + totalF;
+
+            return {
+                name, group, stations,
+                totalT, totalF, poang, totalS,
+                sortValue: poang,
+                sortTie: totalS
+            };
         }
 
         function calculateAndSort() {
@@ -737,7 +738,6 @@
             const tbody = document.getElementById('resultsBody');
             const rows = Array.from(tbody.getElementsByTagName('tr'));
 
-            // Update totals for all rows first
             rows.forEach(row => updateTotals(row));
 
             const nonEmptyRows = rows.filter(row => {
@@ -749,15 +749,12 @@
                 const dataA = getRowData(a);
                 const dataB = getRowData(b);
 
-                // Sort by group first
                 const groupDiff = dataA.group.localeCompare(dataB.group);
                 if (groupDiff !== 0) return groupDiff;
 
-                // Then by sortValue (totalT for mode 2, poäng for mode 3) descending
                 const valueDiff = dataB.sortValue - dataA.sortValue;
                 if (valueDiff !== 0) return valueDiff;
 
-                // Then by tie-breaker descending
                 return dataB.sortTie - dataA.sortTie;
             });
 
@@ -777,27 +774,21 @@
             const leader = document.getElementById('leader').value;
             const freeText = document.getElementById('freeText').value;
             const groupsConfig = document.getElementById('groupsConfig').value;
+            const sarStations = getSarStations();
+            const sarConfig = sarStations.map(v => v ? '1' : '0').join(',');
             const rows = Array.from(document.getElementById('resultsBody').getElementsByTagName('tr'));
 
             let csv = '\uFEFF';
-            // Metadata line: title;date;leader;freeText;mode;groupsConfig
-            csv += `${competitionTitle};${date};${leader};${freeText.replace(/\n/g, '\\n')};${currentMode};${groupsConfig}\n`;
+            // Metadata line: title;date;leader;freeText;sarConfig;groupsConfig
+            csv += `${competitionTitle};${date};${leader};${freeText.replace(/\n/g, '\\n')};${sarConfig};${groupsConfig}\n`;
 
             rows.forEach(row => {
                 const data = getRowData(row);
                 let line = `${data.name};${data.group}`;
                 data.stations.forEach(stn => {
-                    if (currentMode === 2) {
-                        line += `;${stn.t};${stn.m}`;
-                    } else {
-                        line += `;${stn.t};${stn.f};${stn.s}`;
-                    }
+                    line += `;${stn.t};${stn.f};${stn.s}`;
                 });
-                if (currentMode === 2) {
-                    line += `;${data.totalT};${data.totalM};${data.sar}`;
-                } else {
-                    line += `;${data.totalT};${data.totalF};${data.poang};${data.sarp}`;
-                }
+                line += `;${data.totalT};${data.totalF};${data.poang};${data.totalS}`;
                 csv += line + '\n';
             });
 
@@ -823,20 +814,30 @@
                 const [metadataLine, ...dataLines] = lines;
 
                 const metaParts = metadataLine.split(';');
-                // Expected: title;date;leader;freeText;mode;groupsConfig
+                // Expected: title;date;leader;freeText;sarConfig;groupsConfig
                 if (metaParts.length >= 6) {
                     document.getElementById('competitionTitle').value = metaParts[0];
                     document.getElementById('date').value = metaParts[1];
                     document.getElementById('leader').value = metaParts[2];
                     document.getElementById('freeText').value = metaParts[3].replace(/\\n/g, '\n');
-                    const loadedMode = parseInt(metaParts[4]);
-                    document.getElementById('groupsConfig').value = metaParts[5];
 
-                    if (loadedMode === 2 || loadedMode === 3) {
-                        currentMode = loadedMode;
-                        document.querySelector(`input[name="fieldMode"][value="${currentMode}"]`).checked = true;
-                        updateTableHeader();
+                    const sarConfig = metaParts[4];
+                    // Check if sarConfig looks like "0,1,0,1,0,0" (new format) or "2"/"3" (old format)
+                    if (sarConfig.includes(',')) {
+                        const sarValues = sarConfig.split(',');
+                        for (let i = 0; i < NUM_STATIONS; i++) {
+                            document.getElementById('sarStn' + (i + 1)).checked = sarValues[i] === '1';
+                        }
+                    } else {
+                        // Legacy: old mode 3 = all stations have S, mode 2 = none
+                        const oldMode = parseInt(sarConfig);
+                        for (let i = 0; i < NUM_STATIONS; i++) {
+                            document.getElementById('sarStn' + (i + 1)).checked = (oldMode === 3);
+                        }
                     }
+
+                    document.getElementById('groupsConfig').value = metaParts[5];
+                    updateTableHeader();
                 } else if (metaParts.length >= 4) {
                     document.getElementById('competitionTitle').value = metaParts[0];
                     document.getElementById('date').value = metaParts[1];
@@ -847,21 +848,18 @@
                 const tbody = document.getElementById('resultsBody');
                 tbody.innerHTML = '';
 
-                const valuesPerStation = currentMode;
-                const stationDataCount = NUM_STATIONS * valuesPerStation;
+                const sarStations = getSarStations();
 
                 dataLines.forEach(line => {
                     if (line.trim()) {
                         const parts = line.split(';');
                         const name = parts[0];
                         const group = parts[1];
-                        const stationValues = parts.slice(2, 2 + stationDataCount);
 
                         addRow();
                         const row = tbody.lastElementChild;
                         row.querySelector('.name').value = name;
 
-                        // Set group (make sure option exists)
                         const groupSel = row.querySelector('.group');
                         const existingOpts = Array.from(groupSel.options).map(o => o.value);
                         if (!existingOpts.includes(group)) {
@@ -872,23 +870,18 @@
                         }
                         groupSel.value = group;
 
-                        if (currentMode === 2) {
-                            const tInputs = row.querySelectorAll('.stn-t');
-                            const mInputs = row.querySelectorAll('.stn-m');
-                            for (let s = 0; s < NUM_STATIONS; s++) {
-                                const idx = s * 2;
-                                if (tInputs[s]) tInputs[s].value = stationValues[idx] || '0';
-                                if (mInputs[s]) mInputs[s].value = stationValues[idx + 1] || '0';
-                            }
-                        } else {
-                            const tInputs = row.querySelectorAll('.stn-t');
-                            const fInputs = row.querySelectorAll('.stn-f');
-                            const sInputs = row.querySelectorAll('.stn-s');
-                            for (let s = 0; s < NUM_STATIONS; s++) {
-                                const idx = s * 3;
-                                if (tInputs[s]) tInputs[s].value = stationValues[idx] || '0';
-                                if (fInputs[s]) fInputs[s].value = stationValues[idx + 1] || '0';
-                                if (sInputs[s]) sInputs[s].value = stationValues[idx + 2] || '0';
+                        // Station data: always 3 values per station (T, F, S)
+                        const tInputs = row.querySelectorAll('.stn-t');
+                        const fInputs = row.querySelectorAll('.stn-f');
+                        const sInputs = row.querySelectorAll('.stn-s');
+                        let sIdx = 0;
+                        for (let s = 0; s < NUM_STATIONS; s++) {
+                            const idx = s * 3 + 2; // offset after name;group
+                            if (tInputs[s]) tInputs[s].value = parts[idx] || '0';
+                            if (fInputs[s]) fInputs[s].value = parts[idx + 1] || '0';
+                            if (sarStations[s] && sInputs[sIdx]) {
+                                sInputs[sIdx].value = parts[idx + 2] || '0';
+                                sIdx++;
                             }
                         }
 
@@ -898,7 +891,6 @@
             };
 
             reader.readAsText(file);
-            // Reset file input so same file can be loaded again
             event.target.value = '';
         }
 
@@ -981,7 +973,6 @@
                 return;
             }
 
-            // Always landscape for field shooting (wide table)
             const doc = new jsPDF('landscape');
 
             const img = new Image();
@@ -1009,6 +1000,9 @@
 
         function generatePDFContent(doc, date, leader, title, freeTextContent, rows, startY) {
             let y = startY;
+            const sarStations = getSarStations();
+            const sarCount = sarStations.filter(v => v).length;
+            const hasSarAny = sarCount > 0;
 
             const tableX = 10;
             const tableW = 270;
@@ -1037,7 +1031,6 @@
                 }
             });
 
-            // Sort within each group by sortValue desc, then sortTie desc
             Object.keys(groups).forEach(g => {
                 groups[g].sort((a, b) => {
                     if (b.sortValue !== a.sortValue) return b.sortValue - a.sortValue;
@@ -1052,48 +1045,37 @@
             doc.setTextColor(0, 0, 0);
             doc.setLineWidth(0.5);
 
-            // Build column positions for PDF
-            let colPos;
-            if (currentMode === 2) {
-                // Columns: Pl, Name, Group, [Stn1 T, Stn1 M] x 6, Tot Träff, Tot Mål, Sär
-                const stnStart = tableX + 75;
-                const stnWidth = 10;
-                colPos = {
-                    place: tableX + 2,
-                    name: tableX + 12,
-                    group: tableX + 65,
-                    stations: [],
-                    totalT: stnStart + NUM_STATIONS * 2 * stnWidth + 5,
-                    totalM: stnStart + NUM_STATIONS * 2 * stnWidth + 25,
-                    sar: stnStart + NUM_STATIONS * 2 * stnWidth + 45
-                };
-                for (let s = 0; s < NUM_STATIONS; s++) {
-                    colPos.stations.push({
-                        t: stnStart + (s * 2) * stnWidth,
-                        m: stnStart + (s * 2 + 1) * stnWidth
-                    });
+            // Build column positions dynamically
+            const totalDataCols = NUM_STATIONS * 2 + sarCount; // T+F per station + S for sar stations
+            const totalSumCols = hasSarAny ? 4 : 3; // Träff, Figur, Poäng [, Särp]
+            const stnStart = tableX + 75;
+            const availableWidth = tableW - 75 - totalSumCols * 18;
+            const stnColWidth = Math.min(10, availableWidth / totalDataCols);
+
+            const colPos = {
+                place: tableX + 2,
+                name: tableX + 12,
+                group: tableX + 65,
+                stations: []
+            };
+
+            let xPos = stnStart;
+            for (let s = 0; s < NUM_STATIONS; s++) {
+                const stn = { t: xPos, f: xPos + stnColWidth };
+                xPos += stnColWidth * 2;
+                if (sarStations[s]) {
+                    stn.s = xPos;
+                    xPos += stnColWidth;
                 }
-            } else {
-                // Columns: Pl, Name, Group, [Stn1 T, Stn1 F, Stn1 S] x 6, Träff, Figur, Poäng, Särp
-                const stnStart = tableX + 75;
-                const stnWidth = 9;
-                colPos = {
-                    place: tableX + 2,
-                    name: tableX + 12,
-                    group: tableX + 65,
-                    stations: [],
-                    totalT: stnStart + NUM_STATIONS * 3 * stnWidth + 3,
-                    totalF: stnStart + NUM_STATIONS * 3 * stnWidth + 18,
-                    poang: stnStart + NUM_STATIONS * 3 * stnWidth + 33,
-                    sarp: stnStart + NUM_STATIONS * 3 * stnWidth + 48
-                };
-                for (let s = 0; s < NUM_STATIONS; s++) {
-                    colPos.stations.push({
-                        t: stnStart + (s * 3) * stnWidth,
-                        f: stnStart + (s * 3 + 1) * stnWidth,
-                        s: stnStart + (s * 3 + 2) * stnWidth
-                    });
-                }
+                colPos.stations.push(stn);
+            }
+
+            xPos += 3;
+            colPos.totalT = xPos;
+            colPos.totalF = xPos + 15;
+            colPos.poang = xPos + 30;
+            if (hasSarAny) {
+                colPos.sarp = xPos + 45;
             }
 
             // Draw header line
@@ -1103,23 +1085,17 @@
             doc.text('Namn', colPos.name, y);
             doc.text('Grp', colPos.group, y);
 
-            if (currentMode === 2) {
-                for (let s = 0; s < NUM_STATIONS; s++) {
-                    doc.text(`S${s + 1}T`, colPos.stations[s].t, y);
-                    doc.text(`S${s + 1}M`, colPos.stations[s].m, y);
-                }
-                doc.text('Träff', colPos.totalT, y);
-                doc.text('Mål', colPos.totalM, y);
-                doc.text('Sär', colPos.sar, y);
-            } else {
-                for (let s = 0; s < NUM_STATIONS; s++) {
-                    doc.text(`${s + 1}T`, colPos.stations[s].t, y);
-                    doc.text(`${s + 1}F`, colPos.stations[s].f, y);
+            for (let s = 0; s < NUM_STATIONS; s++) {
+                doc.text(`${s + 1}T`, colPos.stations[s].t, y);
+                doc.text(`${s + 1}F`, colPos.stations[s].f, y);
+                if (sarStations[s]) {
                     doc.text(`${s + 1}S`, colPos.stations[s].s, y);
                 }
-                doc.text('Träff', colPos.totalT, y);
-                doc.text('Figur', colPos.totalF, y);
-                doc.text('Poäng', colPos.poang, y);
+            }
+            doc.text('Träff', colPos.totalT, y);
+            doc.text('Figur', colPos.totalF, y);
+            doc.text('Poäng', colPos.poang, y);
+            if (hasSarAny) {
                 doc.text('Särp', colPos.sarp, y);
             }
 
@@ -1135,7 +1111,6 @@
 
                 if (groupIndex > 0) y += 5;
 
-                // Group header
                 if (y > pageLimit) { doc.addPage(); y = 20; }
                 doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
@@ -1158,32 +1133,22 @@
                     doc.text(result.name, colPos.name, y);
                     doc.text(result.group, colPos.group, y);
 
-                    if (currentMode === 2) {
-                        result.stations.forEach((stn, s) => {
-                            doc.setFont('helvetica', 'normal');
-                            doc.text(stn.t.toString(), colPos.stations[s].t, y);
-                            doc.text(stn.m.toString(), colPos.stations[s].m, y);
-                        });
-
-                        doc.setFont('helvetica', 'bold');
-                        doc.text(result.totalT.toString(), colPos.totalT, y);
-                        doc.text(result.totalM.toString(), colPos.totalM, y);
+                    result.stations.forEach((stn, s) => {
                         doc.setFont('helvetica', 'normal');
-                        doc.text(result.sar.toString(), colPos.sar, y);
-                    } else {
-                        result.stations.forEach((stn, s) => {
-                            doc.setFont('helvetica', 'normal');
-                            doc.text(stn.t.toString(), colPos.stations[s].t, y);
-                            doc.text(stn.f.toString(), colPos.stations[s].f, y);
+                        doc.text(stn.t.toString(), colPos.stations[s].t, y);
+                        doc.text(stn.f.toString(), colPos.stations[s].f, y);
+                        if (sarStations[s]) {
                             doc.text(stn.s.toString(), colPos.stations[s].s, y);
-                        });
+                        }
+                    });
 
-                        doc.setFont('helvetica', 'bold');
-                        doc.text(result.totalT.toString(), colPos.totalT, y);
-                        doc.text(result.totalF.toString(), colPos.totalF, y);
-                        doc.text(result.poang.toString(), colPos.poang, y);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(result.totalT.toString(), colPos.totalT, y);
+                    doc.text(result.totalF.toString(), colPos.totalF, y);
+                    doc.text(result.poang.toString(), colPos.poang, y);
+                    if (hasSarAny) {
                         doc.setFont('helvetica', 'normal');
-                        doc.text(result.sarp.toString(), colPos.sarp, y);
+                        doc.text(result.totalS.toString(), colPos.sarp, y);
                     }
 
                     y += rowSpacing;
@@ -1229,12 +1194,13 @@
         const STORAGE_KEY = 'faltskytte_autosave';
         function autoSave() {
             try {
+                const sarStations = getSarStations();
                 const data = {
                     title: document.getElementById('competitionTitle').value,
                     date: document.getElementById('date').value,
                     leader: document.getElementById('leader').value,
                     freeText: document.getElementById('freeText').value,
-                    mode: currentMode,
+                    sarStations: sarStations,
                     groupsConfig: document.getElementById('groupsConfig').value,
                     rows: []
                 };
@@ -1266,11 +1232,19 @@
                     document.getElementById('groupsConfig').value = data.groupsConfig;
                 }
 
-                if (data.mode && (data.mode === 2 || data.mode === 3)) {
-                    currentMode = data.mode;
-                    document.querySelector(`input[name="fieldMode"][value="${currentMode}"]`).checked = true;
-                    updateTableHeader();
+                // Restore sar station config
+                if (data.sarStations && Array.isArray(data.sarStations)) {
+                    for (let i = 0; i < NUM_STATIONS; i++) {
+                        document.getElementById('sarStn' + (i + 1)).checked = !!data.sarStations[i];
+                    }
+                } else if (data.mode) {
+                    // Legacy: old mode 3 = all S, mode 2 = no S
+                    for (let i = 0; i < NUM_STATIONS; i++) {
+                        document.getElementById('sarStn' + (i + 1)).checked = (data.mode === 3);
+                    }
                 }
+
+                updateTableHeader();
 
                 const tbody = document.getElementById('resultsBody');
                 tbody.innerHTML = '';
@@ -1297,8 +1271,9 @@
             document.getElementById('leader').value = '';
             document.getElementById('freeText').value = '';
             document.getElementById('groupsConfig').value = 'A,C,R';
-            currentMode = 2;
-            document.querySelector('input[name="fieldMode"][value="2"]').checked = true;
+            for (let i = 1; i <= NUM_STATIONS; i++) {
+                document.getElementById('sarStn' + i).checked = false;
+            }
             updateTableHeader();
             addRow(); addRow();
         }
