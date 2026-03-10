@@ -352,6 +352,16 @@
 
     <main class="main" id="mainContent"></main>
 
+    <div id="unlockOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:9999; display:none; align-items:center; justify-content:center;">
+        <div style="background:white; padding:28px 32px; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.2); max-width:360px; width:90%; text-align:center;">
+            <h3 style="margin:0 0 8px; font-size:16px; color:#1a1a2e;">Lösenordsskydd aktivt</h3>
+            <p style="font-size:13px; color:#6b7280; margin:0 0 16px;">Ange lösenord för att låsa upp dina inställningar.</p>
+            <input type="password" id="unlockPassword" placeholder="Lösenord" style="width:100%; padding:8px 12px; border:1px solid #d0d5dd; border-radius:6px; font-size:14px; font-family:inherit; margin-bottom:8px;">
+            <p id="unlockError" style="font-size:12px; color:#dc2626; margin:0 0 8px; display:none;">Fel lösenord. Försök igen.</p>
+            <button onclick="unlockData()" style="width:100%; padding:9px; border:none; border-radius:6px; background:#3b82f6; color:white; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">Lås upp</button>
+        </div>
+    </div>
+
     <script>
         const homeHTML = `
         <div class="home-page">
@@ -364,6 +374,27 @@
                     <p>Alla inställningar nedan sparas automatiskt i din webbläsare och delas mellan alla tävlingsformer.</p>
                     <p style="margin-top: 8px;"><strong>Så här gör du:</strong> Konfigurera mailadress, logotyp och medlemslista nedan. Välj sedan tävlingsform i menyn till vänster. Fyll i skyttarnas namn och resultat. Använd "Skapa PDF" för rapport eller "Skicka resultat" för att exportera och maila.</p>
                     <p style="margin-top: 8px; font-size: 12px; color: #6b7280;">Öppen källkod under MIT-licens — <a href="https://github.com/easynutswe/Skytteresultat" target="_blank" style="color: #3b82f6;">github.com/easynutswe/Skytteresultat</a></p>
+                </div>
+
+                <div class="section-box">
+                    <h4>Datalagring</h4>
+                    <p>All data (mailadress, logotyp, medlemslista och resultat) sparas lokalt i din webbläsare via <strong>localStorage</strong>. Inget skickas till någon server. Datan finns bara på just denna dator och i just denna webbläsare.</p>
+                    <p>Datan är isolerad till denna webbplats — andra sajter kan inte läsa den. Däremot kan någon med fysisk tillgång till datorn teoretiskt läsa webbläsarens lagrade data.</p>
+                    <p style="margin-top: 8px;"><strong>Utökat skydd (valfritt):</strong> Aktivera kryptering nedan för att skydda datan med ett lösenord. Datan krypteras med AES-256 och kan bara läsas med rätt lösenord. Du behöver ange lösenordet varje gång du öppnar sidan.</p>
+                    <div class="section-action">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #1a5276; cursor: pointer;">
+                            <input type="checkbox" id="encryptionToggle" onchange="toggleEncryption()">
+                            Aktivera lösenordsskydd
+                        </label>
+                        <div id="encryptionFields" style="display: none; margin-top: 8px;">
+                            <div class="input-row">
+                                <input type="password" id="encryptionPassword" placeholder="Ange lösenord" style="flex:1; padding:6px 8px; border:1px solid #d0d5dd; border-radius:6px; font-size:13px; font-family:inherit;">
+                                <button class="btn-action" onclick="applyEncryption()" style="flex:none; padding:6px 14px;">Spara</button>
+                            </div>
+                            <p style="margin-top: 4px; font-size: 11px; color: #dc2626;">OBS: Glömt lösenord = förlorad data. Det går inte att återställa.</p>
+                        </div>
+                        <div class="setting-status" id="encryptionStatus"></div>
+                    </div>
                 </div>
 
                 <div class="section-box">
@@ -506,10 +537,138 @@
                     membersEl.textContent = list.length + ' medlemmar laddade';
                 } catch(e) {}
             }
+
+            // Restore encryption checkbox state
+            const toggle = document.getElementById('encryptionToggle');
+            const fields = document.getElementById('encryptionFields');
+            const status = document.getElementById('encryptionStatus');
+            if (toggle && localStorage.getItem('encryptedSettings')) {
+                toggle.checked = true;
+                if (fields) fields.style.display = 'block';
+                if (status) status.textContent = 'Kryptering aktiv';
+            }
         }
 
-        // Init
-        showHome();
+        // --- Encryption helpers (AES-256-GCM via Web Crypto API) ---
+        const SETTINGS_KEYS = ['resultEmail', 'customLogo', 'membersList'];
+
+        async function deriveKey(password, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+            return crypto.subtle.deriveKey(
+                { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        async function encryptData(password) {
+            const data = {};
+            SETTINGS_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v) data[k] = v; });
+            const plaintext = new TextEncoder().encode(JSON.stringify(data));
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveKey(password, salt);
+            const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, plaintext);
+            // Store as base64: salt + iv + ciphertext
+            const combined = new Uint8Array(salt.length + iv.length + new Uint8Array(ciphertext).length);
+            combined.set(salt, 0);
+            combined.set(iv, salt.length);
+            combined.set(new Uint8Array(ciphertext), salt.length + iv.length);
+            return btoa(String.fromCharCode(...combined));
+        }
+
+        async function decryptData(password, encoded) {
+            const raw = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
+            const salt = raw.slice(0, 16);
+            const iv = raw.slice(16, 28);
+            const ciphertext = raw.slice(28);
+            const key = await deriveKey(password, salt);
+            const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ciphertext);
+            return JSON.parse(new TextDecoder().decode(plaintext));
+        }
+
+        function toggleEncryption() {
+            const toggle = document.getElementById('encryptionToggle');
+            const fields = document.getElementById('encryptionFields');
+            const status = document.getElementById('encryptionStatus');
+            if (toggle.checked) {
+                fields.style.display = 'block';
+                status.textContent = '';
+            } else {
+                fields.style.display = 'none';
+                // Disable encryption: remove encrypted blob, keep plaintext
+                localStorage.removeItem('encryptedSettings');
+                status.textContent = 'Kryptering avaktiverad';
+                setTimeout(() => { if (status) status.textContent = ''; }, 3000);
+            }
+        }
+
+        async function applyEncryption() {
+            const pw = document.getElementById('encryptionPassword').value;
+            if (!pw || pw.length < 4) { alert('Lösenordet måste vara minst 4 tecken.'); return; }
+            try {
+                const encrypted = await encryptData(pw);
+                localStorage.setItem('encryptedSettings', encrypted);
+                // Remove plaintext
+                SETTINGS_KEYS.forEach(k => localStorage.removeItem(k));
+                document.getElementById('encryptionPassword').value = '';
+                document.getElementById('encryptionStatus').textContent = 'Kryptering aktiv — datan är nu skyddad';
+                // Immediately unlock for this session
+                sessionUnlocked = true;
+                // Re-decrypt to localStorage for this session
+                const data = await decryptData(pw, encrypted);
+                Object.entries(data).forEach(([k, v]) => localStorage.setItem(k, v));
+                restoreHomeState();
+            } catch(e) {
+                alert('Fel vid kryptering: ' + e.message);
+            }
+        }
+
+        let sessionUnlocked = false;
+
+        async function unlockData() {
+            const pw = document.getElementById('unlockPassword').value;
+            const errorEl = document.getElementById('unlockError');
+            try {
+                const encrypted = localStorage.getItem('encryptedSettings');
+                const data = await decryptData(pw, encrypted);
+                // Write plaintext to localStorage for this session
+                Object.entries(data).forEach(([k, v]) => localStorage.setItem(k, v));
+                sessionUnlocked = true;
+                document.getElementById('unlockOverlay').style.display = 'none';
+                showHome();
+            } catch(e) {
+                errorEl.style.display = 'block';
+            }
+        }
+
+        // On page close: re-encrypt and remove plaintext if encryption is active
+        window.addEventListener('beforeunload', async function() {
+            if (!sessionUnlocked) return;
+            const encrypted = localStorage.getItem('encryptedSettings');
+            if (!encrypted) return;
+            // Remove plaintext keys (encrypted blob is already saved)
+            SETTINGS_KEYS.forEach(k => localStorage.removeItem(k));
+        });
+
+        // --- Init ---
+        (function() {
+            const encrypted = localStorage.getItem('encryptedSettings');
+            const hasPlaintext = SETTINGS_KEYS.some(k => localStorage.getItem(k));
+            if (encrypted && !hasPlaintext) {
+                // Need to unlock
+                document.getElementById('unlockOverlay').style.display = 'flex';
+            }
+            showHome();
+
+            // Allow Enter key in unlock dialog
+            document.getElementById('unlockPassword').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') unlockData();
+            });
+        })();
     </script>
 
 </body>
