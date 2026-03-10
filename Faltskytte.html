@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultatmall Fältskytte</title>
+    <script src="jspdf.umd_.min_.js"></script>
+    <script>if(!window.jspdf){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>')}</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0; padding: 20px;
+            background-color: #f4f6f8; color: #1a1a2e;
+        }
+        .container {
+            width: 1750px; margin: 0;
+            background-color: white; padding: 24px 24px 200px 24px;
+            border-radius: 0; box-shadow: none; min-height: 100vh;
+        }
+        .page-title { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; margin: 0 0 20px 0; letter-spacing: -0.02em; }
+        .instructions { background-color: #f8f9fb; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e8ecf0; }
+        .instructions h3 { margin: 0 0 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 600; }
+        .instructions p { margin: 4px 0; line-height: 1.5; font-size: 13px; color: #4a5568; }
+        .setup-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .setup-box { background-color: #f0f7ff; padding: 14px 16px; border-radius: 8px; border: 1px solid #c7ddf5; }
+        .setup-box h4 { margin: 0 0 6px 0; color: #1a5276; font-size: 13px; font-weight: 600; }
+        .setup-box p { margin: 0 0 6px 0; font-size: 12px; color: #5a6778; }
+        .setup-box--neutral { background-color: #f8f9fb; border-color: #e8ecf0; min-height: 60px; }
+        .setup-box--neutral h4 { color: #1a1a2e; }
+        .setup-box label { font-size: 13px; cursor: pointer; display: inline-block; margin: 4px 12px 4px 0; }
+        .members-count { font-size: 12px; color: #666; margin-left: 10px; }
+        .logo-preview { max-width: 200px; max-height: 80px; margin-top: 8px; border: 1px solid #e0e0e0; padding: 4px; background: white; border-radius: 4px; }
+        .meta-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .meta-fields { display: flex; flex-direction: column; gap: 8px; min-width: 220px; }
+        .meta-fields input { padding: 10px 12px; border: 1px solid #d0d5dd; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .meta-fields input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .meta-freetext { flex: 1; display: flex; flex-direction: column; }
+        .meta-freetext textarea { flex: 1; min-height: 0; padding: 10px; border: 1px solid #d0d5dd; border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical; }
+        .meta-freetext textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .editor-toolbar { display: flex; gap: 4px; margin-bottom: 8px; align-items: center; }
+        .editor-toolbar button { padding: 5px 10px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: background 0.15s; }
+        .editor-toolbar button:hover { background-color: #5a6268; }
+        .toolbar-label { font-size: 12px; font-weight: 600; color: #5a6778; margin-right: 6px; align-self: center; }
+        .toolbar-sep { width: 1px; height: 18px; background: #d0d5dd; align-self: center; margin: 0 2px; }
+        .buttons { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        button { padding: 9px 18px; font-size: 13px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+        button:active { transform: scale(0.97); }
+        .btn-primary { background-color: #22c55e; color: white; } .btn-primary:hover { background-color: #16a34a; }
+        .btn-calc { background-color: #3b82f6; color: white; } .btn-calc:hover { background-color: #2563eb; }
+        .btn-csv { background-color: #64748b; color: white; } .btn-csv:hover { background-color: #475569; }
+        .btn-load { background-color: #8b5cf6; color: white; } .btn-load:hover { background-color: #7c3aed; }
+        .btn-submit { background-color: #0ea5e9; color: white; } .btn-submit:hover { background-color: #0284c7; }
+        .btn-pdf { background-color: #ef4444; color: white; } .btn-pdf:hover { background-color: #dc2626; }
+        .btn-clear { background-color: #374151; color: white; } .btn-clear:hover { background-color: #1f2937; }
+        table { border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #e5e7eb; padding: 7px 6px; text-align: center; font-size: 13px; }
+        th { background-color: #f8f9fb; font-weight: 600; color: #374151; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+        input { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; box-sizing: border-box; text-align: center; font-size: 13px; font-family: inherit; transition: border-color 0.15s; }
+        input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
+        input[type="number"] { width: 40px; }
+        .name-input { width: 200px; text-align: left; }
+        .name-input-container { position: relative; width: 200px; }
+        .suggestions-dropdown { position: fixed; background: white; border: 1px solid #3b82f6; border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 10000; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .suggestion-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 13px; text-align: left; line-height: 1.3; transition: background 0.1s; }
+        .suggestion-item:hover, .suggestion-item.highlighted { background-color: #eff6ff; color: #1d4ed8; }
+        .suggestion-item:last-child { border-bottom: none; }
+        .group-select { width: 100px; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; background-color: white; cursor: pointer; font-size: 13px; font-family: inherit; }
+        .group-select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
+        .total-col { background-color: #ecfdf5 !important; font-weight: 700; color: #065f46; }
+        .summary-col { background-color: #f8fafc !important; font-weight: 600; color: #334155; }
+        .station-header { background-color: #f1f5f9 !important; }
+        .error { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
+        #submitModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 24px; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); z-index: 1000; max-width: 500px; width: 90%; }
+        #submitModal h3 { margin: 0 0 12px 0; font-size: 1.1rem; }
+        #submitModal p { margin: 4px 0; font-size: 13px; color: #4a5568; }
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); z-index: 999; }
+        .autosave-status { position: fixed; bottom: 12px; right: 16px; font-size: 11px; color: #9ca3af; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+        .autosave-status.show { opacity: 1; }
+        .metadata .name-input-container { width: 100%; }
+        .metadata .name-input-container input { width: 100%; }
+        .groups-input { width: 200px; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 13px; font-family: inherit; text-align: left; }
+        .groups-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
+        .score-input { width: 40px; }
+        @media (max-width: 900px) { .setup-row { grid-template-columns: 1fr; } }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">Resultatmall Fältskytte</h1>
+
+        <div class="instructions">
+            <h3>Instruktioner</h3>
+            <p>1. Välj format: "Träff / Mål" (2 värden per station, t.ex. Skinksmällen/Mörkerfälten) eller "Träff / Figur / Särskiljning" (3 värden per station, t.ex. Fältskjutning KM)</p>
+            <p>2. Ange vapengrupper som kommaseparerade värden (standard: A,C,R)</p>
+            <p>3. Fyll i tävlingsnamn, datum och skjutledare</p>
+            <p>4. Lägg till rader och fyll i namn, grupp och stationsvärden</p>
+            <p>5. Tryck "Beräkna &amp; Sortera" för att summera och sortera efter grupp/poäng</p>
+            <p>6. Använd "Skicka resultat" för att spara CSV + PDF och förbereda mail</p>
+            <p>7. Spara gärna en digital kopia (Spara CSV) som du kan ladda upp (Ladda CSV) för att editera om du fyllt i något resultat fel och skicka in på nytt.</p>
+            <p><strong>8. Använd "Skapa PDF" för att generera en snygg PDF-rapport av resultaten!</strong></p>
+            <p><strong>9. Medlemsregister laddas automatiskt via inställningarna i sidomenyn för snabbare namnförslag.</strong></p>
+        </div>
+
+        <div class="setup-row">
+            <div class="setup-box setup-box--neutral">
+                <h4>Välj format</h4>
+                <label><input type="radio" name="fieldMode" value="2" checked onchange="changeMode(2)"> Träff / Mål (2 värden per station)</label><br>
+                <label><input type="radio" name="fieldMode" value="3" onchange="changeMode(3)"> Träff / Figur / Särskiljning (3 värden per station)</label>
+            </div>
+            <div class="setup-box">
+                <h4>Vapengrupper</h4>
+                <p>Kommaseparerade gruppnamn</p>
+                <input type="text" id="groupsConfig" class="groups-input" value="A,C,R" onchange="updateGroupOptions()">
+            </div>
+        </div>
+
+        <div class="meta-row">
+            <div class="meta-fields">
+                <input type="text" id="competitionTitle" placeholder="Tävlingsnamn" value="Fältskytte" onblur="this.value = capitalizeFirstLetter(this.value)">
+                <input type="date" id="date" class="date-input">
+                <div class="name-input-container" style="width: 100%;">
+                    <input type="text" id="leader" placeholder="Skjutledare" onblur="this.value = capitalizeName(this.value)">
+                </div>
+            </div>
+            <div class="meta-freetext">
+                <div class="editor-toolbar">
+                    <span class="toolbar-label">Fritext</span>
+                    <button type="button" onclick="formatText('bold')" title="Fet stil"><b>B</b></button>
+                    <button type="button" onclick="formatText('italic')" title="Kursiv"><i>I</i></button>
+                    <button type="button" onclick="formatText('underline')" title="Understruken"><u>U</u></button>
+                    <span class="toolbar-sep"></span>
+                    <button type="button" onclick="insertText('• ')" title="Punktlista">•</button>
+                    <button type="button" onclick="insertText('— ')" title="Tankstreck">—</button>
+                    <button type="button" onclick="insertText('\n')" title="Ny rad">↵</button>
+                    <span class="toolbar-sep"></span>
+                    <button type="button" onclick="clearText()" title="Rensa text">✕</button>
+                </div>
+                <textarea id="freeText" placeholder="Skriv här... Använd verktygsfältet ovan för formatering." rows="4"></textarea>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-primary" onclick="addRow()">Lägg till rad</button>
+            <button class="btn-calc" onclick="calculateAndSort()">Beräkna &amp; Sortera</button>
+            <button class="btn-csv" onclick="saveToFile()">Spara CSV</button>
+            <input type="file" id="fileInput" accept=".csv" onchange="loadFile(event)" style="display: none;">
+            <button onclick="document.getElementById('fileInput').click()">Ladda CSV</button>
+            <button class="btn-submit" onclick="submitResults()">Skicka resultat</button>
+            <button class="btn-pdf" onclick="skapaPDF()">Skapa PDF</button>
+            <button class="btn-clear" onclick="rensaAllt()">Rensa allt</button>
+        </div>
+
+        <table id="resultsTable">
+            <thead>
+                <tr id="tableHeaderTop"></tr>
+                <tr id="tableHeaderSub"></tr>
+            </thead>
+            <tbody id="resultsBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="submitModal">
+        <h3>Skicka resultat</h3>
+        <p>1. Filerna har sparats i din Downloads-mapp:</p>
+        <p>&nbsp;&nbsp;&nbsp;• "[tävlingsnamn]_[datum].csv"</p>
+        <p>&nbsp;&nbsp;&nbsp;• "[tävlingsnamn]_[datum].pdf"</p>
+        <p>2. Skicka BÅDA filerna (.csv och .pdf) till ansvarig</p>
+        <button onclick="closeModal()">OK</button>
+    </div>
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+
+    <script>
+        let currentMode = 2; // 2 = Träff/Mål, 3 = Träff/Figur/Särskiljning
+        const NUM_STATIONS = 6;
+        let preloadedMembers = [];
+        let customLogoDataUrl = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTableHeader();
+            addRow();
+            addRow();
+            const today = new Date();
+            document.getElementById('date').value = today.toISOString().split('T')[0];
+
+            const leaderInput = document.getElementById('leader');
+            setupNameInputWithSuggestions(leaderInput, true);
+        });
+
+        function getGroupOptions() {
+            const val = document.getElementById('groupsConfig').value.trim();
+            if (!val) return ['A', 'C', 'R'];
+            return val.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        }
+
+        function updateGroupOptions() {
+            const options = getGroupOptions();
+            const selects = document.querySelectorAll('#resultsBody .group');
+            selects.forEach(sel => {
+                const current = sel.value;
+                sel.innerHTML = '';
+                options.forEach(opt => {
+                    const o = document.createElement('option');
+                    o.value = opt;
+                    o.textContent = opt;
+                    sel.appendChild(o);
+                });
+                if (options.includes(current)) {
+                    sel.value = current;
+                }
+            });
+        }
+
+        function capitalizeName(str) {
+            if (!str) return str;
+            return str.replace(/(^|\s)[a-zA-ZåäöÅÄÖ]/g, function(match) {
+                return match.toUpperCase();
+            });
+        }
+
+        function capitalizeFirstLetter(str) {
+            if (!str) return str;
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function preloadMembers() {
+            try {
+                const saved = localStorage.getItem('membersList');
+                if (saved) {
+                    const lines = JSON.parse(saved);
+                    preloadedMembers = lines.map(name => capitalizeName(name));
+                }
+            } catch(e) {}
+        }
+
+        function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
+            const container = nameInput.parentElement;
+            let dropdown = container.querySelector('.suggestions-dropdown');
+
+            if (!dropdown) {
+                dropdown = document.createElement('div');
+                dropdown.className = 'suggestions-dropdown';
+                container.appendChild(dropdown);
+            }
+
+            let currentHighlightIndex = -1;
+            let isAutoCompleting = false;
+            let wasAutoCompleted = false;
+            let originalAutoCompletedValue = '';
+
+            nameInput.addEventListener('input', function() {
+                if (isAutoCompleting) {
+                    isAutoCompleting = false;
+                    return;
+                }
+
+                if (wasAutoCompleted && this.value !== originalAutoCompletedValue) {
+                    hideDropdown();
+                    return;
+                }
+
+                const query = this.value.toLowerCase().trim();
+                currentHighlightIndex = -1;
+
+                if (query.length === 0 || preloadedMembers.length === 0) {
+                    hideDropdown();
+                    return;
+                }
+
+                const exactMatches = preloadedMembers.filter(name =>
+                    name.toLowerCase().startsWith(query)
+                );
+                const partialMatches = preloadedMembers.filter(name =>
+                    name.toLowerCase().includes(query) && !name.toLowerCase().startsWith(query)
+                );
+
+                const allMatches = [...exactMatches, ...partialMatches];
+
+                if (allMatches.length === 0) {
+                    hideDropdown();
+                    return;
+                }
+
+                if (allMatches.length === 1 && exactMatches.length === 1) {
+                    isAutoCompleting = true;
+                    wasAutoCompleted = true;
+                    originalAutoCompletedValue = allMatches[0];
+
+                    const currentValue = allMatches[0];
+                    setTimeout(() => {
+                        this.value = currentValue;
+                        hideDropdown();
+
+                        if (isLeaderField) {
+                            const freeTextArea = document.getElementById('freeText');
+                            if (freeTextArea) freeTextArea.focus();
+                        } else {
+                            const row = this.closest('tr');
+                            const groupSelect = row ? row.querySelector('.group') : null;
+                            if (groupSelect) groupSelect.focus();
+                        }
+                    }, 100);
+                    return;
+                }
+
+                showSuggestions(allMatches.slice(0, 6));
+            });
+
+            nameInput.addEventListener('keydown', function(e) {
+                const suggestionItems = dropdown.querySelectorAll('.suggestion-item');
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    currentHighlightIndex = Math.min(currentHighlightIndex + 1, suggestionItems.length - 1);
+                    updateHighlight();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    currentHighlightIndex = Math.max(currentHighlightIndex - 1, -1);
+                    updateHighlight();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentHighlightIndex >= 0 && suggestionItems[currentHighlightIndex]) {
+                        selectSuggestion(suggestionItems[currentHighlightIndex].textContent);
+                    }
+                } else if (e.key === 'Escape') {
+                    hideDropdown();
+                } else if (e.key === 'Tab') {
+                    hideDropdown();
+                }
+            });
+
+            nameInput.addEventListener('blur', function() {
+                setTimeout(() => hideDropdown(), 150);
+            });
+
+            nameInput.addEventListener('focus', function() {
+                if (this.value === '') {
+                    isAutoCompleting = false;
+                    wasAutoCompleted = false;
+                    originalAutoCompletedValue = '';
+                }
+            });
+
+            function showSuggestions(matches) {
+                dropdown.innerHTML = '';
+
+                matches.forEach(name => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = name;
+                    item.addEventListener('click', () => selectSuggestion(name));
+                    dropdown.appendChild(item);
+                });
+
+                dropdown.style.display = 'block';
+
+                setTimeout(() => {
+                    const inputRect = nameInput.getBoundingClientRect();
+                    const dropdownHeight = dropdown.offsetHeight;
+                    dropdown.style.left = inputRect.left + 'px';
+                    dropdown.style.width = inputRect.width + 'px';
+                    dropdown.style.top = (inputRect.top - dropdownHeight - 5) + 'px';
+                }, 0);
+            }
+
+            function hideDropdown() {
+                dropdown.style.display = 'none';
+                currentHighlightIndex = -1;
+            }
+
+            function updateHighlight() {
+                const suggestionItems = dropdown.querySelectorAll('.suggestion-item');
+                suggestionItems.forEach((item, index) => {
+                    item.classList.toggle('highlighted', index === currentHighlightIndex);
+                });
+            }
+
+            function selectSuggestion(name) {
+                isAutoCompleting = true;
+                wasAutoCompleted = true;
+                originalAutoCompletedValue = name;
+                nameInput.value = name;
+                hideDropdown();
+                nameInput.dispatchEvent(new Event('change'));
+
+                setTimeout(() => {
+                    if (isLeaderField) {
+                        const freeTextArea = document.getElementById('freeText');
+                        if (freeTextArea) freeTextArea.focus();
+                    } else {
+                        const row = nameInput.closest('tr');
+                        const groupSelect = row ? row.querySelector('.group') : null;
+                        if (groupSelect) groupSelect.focus();
+                    }
+                }, 50);
+            }
+        }
+
+        function changeMode(mode) {
+            const tbody = document.getElementById('resultsBody');
+            const hasData = Array.from(tbody.rows).some(row => {
+                const name = row.querySelector('.name');
+                return name && name.value.trim() !== '';
+            });
+
+            if (hasData) {
+                if (!confirm('Att byta format rensar alla befintliga rader. Vill du fortsätta?')) {
+                    // Restore radio button
+                    document.querySelector(`input[name="fieldMode"][value="${currentMode}"]`).checked = true;
+                    return;
+                }
+            }
+
+            currentMode = mode;
+            updateTableHeader();
+            tbody.innerHTML = '';
+            addRow();
+            addRow();
+        }
+
+        function updateTableHeader() {
+            const headerTop = document.getElementById('tableHeaderTop');
+            const headerSub = document.getElementById('tableHeaderSub');
+
+            if (currentMode === 2) {
+                // 2-value: Träff / Mål per station
+                let topHtml = '<th rowspan="2" style="min-width: 200px;">Namn</th>';
+                topHtml += '<th rowspan="2" style="min-width: 80px;">Grupp</th>';
+                for (let i = 1; i <= NUM_STATIONS; i++) {
+                    topHtml += `<th colspan="2" class="station-header">Stn ${i}</th>`;
+                }
+                topHtml += '<th rowspan="2" class="total-col">Tot Träff</th>';
+                topHtml += '<th rowspan="2" class="total-col">Tot Mål</th>';
+                topHtml += '<th rowspan="2" class="summary-col">Sär</th>';
+                headerTop.innerHTML = topHtml;
+
+                let subHtml = '';
+                for (let i = 0; i < NUM_STATIONS; i++) {
+                    subHtml += '<th>T</th><th>M</th>';
+                }
+                headerSub.innerHTML = subHtml;
+            } else {
+                // 3-value: Träff / Figur / Särskiljning per station
+                let topHtml = '<th rowspan="2" style="min-width: 200px;">Namn</th>';
+                topHtml += '<th rowspan="2" style="min-width: 80px;">Grupp</th>';
+                for (let i = 1; i <= NUM_STATIONS; i++) {
+                    topHtml += `<th colspan="3" class="station-header">Stn ${i}</th>`;
+                }
+                topHtml += '<th rowspan="2" class="total-col">Träff</th>';
+                topHtml += '<th rowspan="2" class="total-col">Figur</th>';
+                topHtml += '<th rowspan="2" class="total-col">Poäng</th>';
+                topHtml += '<th rowspan="2" class="summary-col">Särp</th>';
+                headerTop.innerHTML = topHtml;
+
+                let subHtml = '';
+                for (let i = 0; i < NUM_STATIONS; i++) {
+                    subHtml += '<th>T</th><th>F</th><th>S</th>';
+                }
+                headerSub.innerHTML = subHtml;
+            }
+        }
+
+        function createScoreInput(className) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.max = '6';
+            input.className = className + ' score-input';
+            input.placeholder = '0';
+            input.style.width = '40px';
+            input.oninput = (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                if (e.target.value.length > 1) {
+                    e.target.value = e.target.value.slice(0, 1);
+                }
+                if (e.target.value !== '' && parseInt(e.target.value) > 6) {
+                    e.target.value = '6';
+                }
+                updateTotals(e.target.closest('tr'));
+            };
+            input.onkeydown = (e) => {
+                if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+                    (e.keyCode === 65 && e.ctrlKey === true) ||
+                    (e.keyCode === 67 && e.ctrlKey === true) ||
+                    (e.keyCode === 86 && e.ctrlKey === true) ||
+                    (e.keyCode === 88 && e.ctrlKey === true)) {
+                    return;
+                }
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            };
+            return input;
+        }
+
+        function addRow() {
+            const tbody = document.getElementById('resultsBody');
+            const row = document.createElement('tr');
+
+            // Name cell
+            const nameTd = document.createElement('td');
+            const nameContainer = document.createElement('div');
+            nameContainer.className = 'name-input-container';
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.className = 'name name-input';
+            nameInput.placeholder = 'Namn';
+            nameInput.addEventListener('blur', function() {
+                this.value = capitalizeName(this.value);
+            });
+            nameContainer.appendChild(nameInput);
+            nameTd.appendChild(nameContainer);
+            row.appendChild(nameTd);
+
+            setupNameInputWithSuggestions(nameInput);
+
+            // Group cell
+            const groupTd = document.createElement('td');
+            const groupSelect = document.createElement('select');
+            groupSelect.className = 'group group-select';
+            const groupOptions = getGroupOptions();
+            groupOptions.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                groupSelect.appendChild(opt);
+            });
+            groupTd.appendChild(groupSelect);
+            row.appendChild(groupTd);
+
+            // Station inputs
+            if (currentMode === 2) {
+                for (let s = 0; s < NUM_STATIONS; s++) {
+                    // Träff
+                    const tTd = document.createElement('td');
+                    tTd.appendChild(createScoreInput('stn-t'));
+                    row.appendChild(tTd);
+                    // Mål
+                    const mTd = document.createElement('td');
+                    mTd.appendChild(createScoreInput('stn-m'));
+                    row.appendChild(mTd);
+                }
+
+                // Total Träff
+                const totTTd = document.createElement('td');
+                totTTd.className = 'total-traff total-col';
+                totTTd.textContent = '0';
+                row.appendChild(totTTd);
+
+                // Total Mål
+                const totMTd = document.createElement('td');
+                totMTd.className = 'total-mal total-col';
+                totMTd.textContent = '0';
+                row.appendChild(totMTd);
+
+                // Sär
+                const sarTd = document.createElement('td');
+                sarTd.className = 'sar summary-col';
+                sarTd.textContent = '0';
+                row.appendChild(sarTd);
+
+            } else {
+                for (let s = 0; s < NUM_STATIONS; s++) {
+                    // Träff
+                    const tTd = document.createElement('td');
+                    tTd.appendChild(createScoreInput('stn-t'));
+                    row.appendChild(tTd);
+                    // Figur
+                    const fTd = document.createElement('td');
+                    fTd.appendChild(createScoreInput('stn-f'));
+                    row.appendChild(fTd);
+                    // Särskiljning
+                    const sTd = document.createElement('td');
+                    sTd.appendChild(createScoreInput('stn-s'));
+                    row.appendChild(sTd);
+                }
+
+                // Träff total
+                const totTTd = document.createElement('td');
+                totTTd.className = 'total-traff total-col';
+                totTTd.textContent = '0';
+                row.appendChild(totTTd);
+
+                // Figur total
+                const totFTd = document.createElement('td');
+                totFTd.className = 'total-figur total-col';
+                totFTd.textContent = '0';
+                row.appendChild(totFTd);
+
+                // Poäng (Träff + Figur)
+                const poangTd = document.createElement('td');
+                poangTd.className = 'total-poang total-col';
+                poangTd.textContent = '0';
+                row.appendChild(poangTd);
+
+                // Särp
+                const sarpTd = document.createElement('td');
+                sarpTd.className = 'total-sarp summary-col';
+                sarpTd.textContent = '0';
+                row.appendChild(sarpTd);
+            }
+
+            // Tab on last input in row => add new row
+            const allInputs = row.querySelectorAll('input[type="number"]');
+            if (allInputs.length > 0) {
+                const lastInput = allInputs[allInputs.length - 1];
+                lastInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                        e.preventDefault();
+                        const currentRow = this.closest('tr');
+                        const allRows = Array.from(tbody.getElementsByTagName('tr'));
+                        const currentIndex = allRows.indexOf(currentRow);
+
+                        if (currentIndex === allRows.length - 1) {
+                            addRow();
+                            const newRow = tbody.lastElementChild;
+                            newRow.querySelector('.name').focus();
+                        } else {
+                            const nextRow = allRows[currentIndex + 1];
+                            nextRow.querySelector('.name').focus();
+                        }
+                    }
+                });
+            }
+
+            tbody.appendChild(row);
+        }
+
+        function updateTotals(row) {
+            if (!row) return;
+
+            if (currentMode === 2) {
+                const tInputs = row.querySelectorAll('.stn-t');
+                const mInputs = row.querySelectorAll('.stn-m');
+                let totalT = 0, totalM = 0;
+                tInputs.forEach(inp => { totalT += parseInt(inp.value) || 0; });
+                mInputs.forEach(inp => { totalM += parseInt(inp.value) || 0; });
+                const totTCell = row.querySelector('.total-traff');
+                const totMCell = row.querySelector('.total-mal');
+                const sarCell = row.querySelector('.sar');
+                if (totTCell) totTCell.textContent = totalT;
+                if (totMCell) totMCell.textContent = totalM;
+                if (sarCell) sarCell.textContent = totalT - totalM;
+            } else {
+                const tInputs = row.querySelectorAll('.stn-t');
+                const fInputs = row.querySelectorAll('.stn-f');
+                const sInputs = row.querySelectorAll('.stn-s');
+                let totalT = 0, totalF = 0, totalS = 0;
+                tInputs.forEach(inp => { totalT += parseInt(inp.value) || 0; });
+                fInputs.forEach(inp => { totalF += parseInt(inp.value) || 0; });
+                sInputs.forEach(inp => { totalS += parseInt(inp.value) || 0; });
+                const totTCell = row.querySelector('.total-traff');
+                const totFCell = row.querySelector('.total-figur');
+                const poangCell = row.querySelector('.total-poang');
+                const sarpCell = row.querySelector('.total-sarp');
+                if (totTCell) totTCell.textContent = totalT;
+                if (totFCell) totFCell.textContent = totalF;
+                if (poangCell) poangCell.textContent = totalT + totalF;
+                if (sarpCell) sarpCell.textContent = totalS;
+            }
+        }
+
+        function validateRowData() {
+            const rows = Array.from(document.getElementById('resultsBody').getElementsByTagName('tr'));
+            let hasErrors = false;
+
+            rows.forEach(row => {
+                const nameInput = row.querySelector('.name');
+                const groupSelect = row.querySelector('.group');
+
+                nameInput.classList.remove('error');
+                groupSelect.classList.remove('error');
+
+                if (nameInput.value.trim() !== '' && groupSelect.value === '') {
+                    groupSelect.classList.add('error');
+                    groupSelect.style.borderColor = '#dc3545';
+                    groupSelect.style.backgroundColor = '#fff5f5';
+                    hasErrors = true;
+                } else {
+                    groupSelect.style.borderColor = '#ddd';
+                    groupSelect.style.backgroundColor = 'white';
+                }
+            });
+
+            if (hasErrors) {
+                alert('Fel: Alla deltagare med namn måste ha en grupp vald!');
+                return false;
+            }
+            return true;
+        }
+
+        function getRowData(row) {
+            const name = row.querySelector('.name').value;
+            const group = row.querySelector('.group').value;
+
+            if (currentMode === 2) {
+                const tInputs = Array.from(row.querySelectorAll('.stn-t'));
+                const mInputs = Array.from(row.querySelectorAll('.stn-m'));
+                const totalT = parseInt(row.querySelector('.total-traff').textContent) || 0;
+                const totalM = parseInt(row.querySelector('.total-mal').textContent) || 0;
+                const sar = parseInt(row.querySelector('.sar').textContent) || 0;
+                return {
+                    name, group,
+                    stations: tInputs.map((t, i) => ({
+                        t: parseInt(t.value) || 0,
+                        m: parseInt(mInputs[i].value) || 0
+                    })),
+                    totalT, totalM, sar,
+                    sortValue: totalT,
+                    sortTie: totalM
+                };
+            } else {
+                const tInputs = Array.from(row.querySelectorAll('.stn-t'));
+                const fInputs = Array.from(row.querySelectorAll('.stn-f'));
+                const sInputs = Array.from(row.querySelectorAll('.stn-s'));
+                const totalT = parseInt(row.querySelector('.total-traff').textContent) || 0;
+                const totalF = parseInt(row.querySelector('.total-figur').textContent) || 0;
+                const poang = parseInt(row.querySelector('.total-poang').textContent) || 0;
+                const sarp = parseInt(row.querySelector('.total-sarp').textContent) || 0;
+                return {
+                    name, group,
+                    stations: tInputs.map((t, i) => ({
+                        t: parseInt(t.value) || 0,
+                        f: parseInt(fInputs[i].value) || 0,
+                        s: parseInt(sInputs[i].value) || 0
+                    })),
+                    totalT, totalF, poang, sarp,
+                    sortValue: poang,
+                    sortTie: sarp
+                };
+            }
+        }
+
+        function calculateAndSort() {
+            if (!validateRowData()) return;
+
+            const tbody = document.getElementById('resultsBody');
+            const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+            // Update totals for all rows first
+            rows.forEach(row => updateTotals(row));
+
+            const nonEmptyRows = rows.filter(row => {
+                const nameInput = row.querySelector('.name');
+                return nameInput && nameInput.value.trim() !== '';
+            });
+
+            const sortedRows = nonEmptyRows.sort((a, b) => {
+                const dataA = getRowData(a);
+                const dataB = getRowData(b);
+
+                // Sort by group first
+                const groupDiff = dataA.group.localeCompare(dataB.group);
+                if (groupDiff !== 0) return groupDiff;
+
+                // Then by sortValue (totalT for mode 2, poäng for mode 3) descending
+                const valueDiff = dataB.sortValue - dataA.sortValue;
+                if (valueDiff !== 0) return valueDiff;
+
+                // Then by tie-breaker descending
+                return dataB.sortTie - dataA.sortTie;
+            });
+
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+            sortedRows.forEach(row => tbody.appendChild(row));
+
+            addRow();
+        }
+
+        function saveToFile() {
+            if (!validateRowData()) return;
+
+            const competitionTitle = document.getElementById('competitionTitle').value || 'Fältskytte';
+            const date = document.getElementById('date').value;
+            const leader = document.getElementById('leader').value;
+            const freeText = document.getElementById('freeText').value;
+            const groupsConfig = document.getElementById('groupsConfig').value;
+            const rows = Array.from(document.getElementById('resultsBody').getElementsByTagName('tr'));
+
+            let csv = '\uFEFF';
+            // Metadata line: title;date;leader;freeText;mode;groupsConfig
+            csv += `${competitionTitle};${date};${leader};${freeText.replace(/\n/g, '\\n')};${currentMode};${groupsConfig}\n`;
+
+            rows.forEach(row => {
+                const data = getRowData(row);
+                let line = `${data.name};${data.group}`;
+                data.stations.forEach(stn => {
+                    if (currentMode === 2) {
+                        line += `;${stn.t};${stn.m}`;
+                    } else {
+                        line += `;${stn.t};${stn.f};${stn.s}`;
+                    }
+                });
+                if (currentMode === 2) {
+                    line += `;${data.totalT};${data.totalM};${data.sar}`;
+                } else {
+                    line += `;${data.totalT};${data.totalF};${data.poang};${data.sarp}`;
+                }
+                csv += line + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const sanitizedTitle = competitionTitle.replace(/[^a-zA-Z0-9åäöÅÄÖ]/g, '_');
+            a.download = `${sanitizedTitle}_${date}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const content = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+                const lines = content.split('\n');
+                const [metadataLine, ...dataLines] = lines;
+
+                const metaParts = metadataLine.split(';');
+                // Expected: title;date;leader;freeText;mode;groupsConfig
+                if (metaParts.length >= 6) {
+                    document.getElementById('competitionTitle').value = metaParts[0];
+                    document.getElementById('date').value = metaParts[1];
+                    document.getElementById('leader').value = metaParts[2];
+                    document.getElementById('freeText').value = metaParts[3].replace(/\\n/g, '\n');
+                    const loadedMode = parseInt(metaParts[4]);
+                    document.getElementById('groupsConfig').value = metaParts[5];
+
+                    if (loadedMode === 2 || loadedMode === 3) {
+                        currentMode = loadedMode;
+                        document.querySelector(`input[name="fieldMode"][value="${currentMode}"]`).checked = true;
+                        updateTableHeader();
+                    }
+                } else if (metaParts.length >= 4) {
+                    document.getElementById('competitionTitle').value = metaParts[0];
+                    document.getElementById('date').value = metaParts[1];
+                    document.getElementById('leader').value = metaParts[2];
+                    document.getElementById('freeText').value = metaParts[3].replace(/\\n/g, '\n');
+                }
+
+                const tbody = document.getElementById('resultsBody');
+                tbody.innerHTML = '';
+
+                const valuesPerStation = currentMode;
+                const stationDataCount = NUM_STATIONS * valuesPerStation;
+
+                dataLines.forEach(line => {
+                    if (line.trim()) {
+                        const parts = line.split(';');
+                        const name = parts[0];
+                        const group = parts[1];
+                        const stationValues = parts.slice(2, 2 + stationDataCount);
+
+                        addRow();
+                        const row = tbody.lastElementChild;
+                        row.querySelector('.name').value = name;
+
+                        // Set group (make sure option exists)
+                        const groupSel = row.querySelector('.group');
+                        const existingOpts = Array.from(groupSel.options).map(o => o.value);
+                        if (!existingOpts.includes(group)) {
+                            const opt = document.createElement('option');
+                            opt.value = group;
+                            opt.textContent = group;
+                            groupSel.appendChild(opt);
+                        }
+                        groupSel.value = group;
+
+                        if (currentMode === 2) {
+                            const tInputs = row.querySelectorAll('.stn-t');
+                            const mInputs = row.querySelectorAll('.stn-m');
+                            for (let s = 0; s < NUM_STATIONS; s++) {
+                                const idx = s * 2;
+                                if (tInputs[s]) tInputs[s].value = stationValues[idx] || '0';
+                                if (mInputs[s]) mInputs[s].value = stationValues[idx + 1] || '0';
+                            }
+                        } else {
+                            const tInputs = row.querySelectorAll('.stn-t');
+                            const fInputs = row.querySelectorAll('.stn-f');
+                            const sInputs = row.querySelectorAll('.stn-s');
+                            for (let s = 0; s < NUM_STATIONS; s++) {
+                                const idx = s * 3;
+                                if (tInputs[s]) tInputs[s].value = stationValues[idx] || '0';
+                                if (fInputs[s]) fInputs[s].value = stationValues[idx + 1] || '0';
+                                if (sInputs[s]) sInputs[s].value = stationValues[idx + 2] || '0';
+                            }
+                        }
+
+                        updateTotals(row);
+                    }
+                });
+            };
+
+            reader.readAsText(file);
+            // Reset file input so same file can be loaded again
+            event.target.value = '';
+        }
+
+        function submitResults() {
+            if (!validateRowData()) return;
+
+            calculateAndSort();
+            saveToFile();
+
+            setTimeout(() => {
+                skapaPDF();
+            }, 100);
+
+            const competitionTitle = document.getElementById('competitionTitle').value;
+            const date = document.getElementById('date').value;
+            document.getElementById('submitModal').style.display = 'block';
+            document.querySelector('.modal-backdrop').style.display = 'block';
+
+            const resultEmail = localStorage.getItem('resultEmail');
+            if (resultEmail) {
+                const emailSubject = encodeURIComponent(`Resultat ${competitionTitle} ${date}`);
+                const emailBody = encodeURIComponent('Hej!\n\nBifogat finns resultaten från dagens tävling i både CSV- och PDF-format.\n\nMvh');
+                setTimeout(() => { window.location.href = `mailto:${resultEmail}?subject=${emailSubject}&body=${emailBody}`; }, 500);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('submitModal').style.display = 'none';
+            document.querySelector('.modal-backdrop').style.display = 'none';
+        }
+
+        function formatText(command) {
+            const textarea = document.getElementById('freeText');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+
+            let formattedText = '';
+            switch(command) {
+                case 'bold': formattedText = `**${selectedText}**`; break;
+                case 'italic': formattedText = `*${selectedText}*`; break;
+                case 'underline': formattedText = `_${selectedText}_`; break;
+            }
+
+            if (selectedText) {
+                textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+                textarea.focus();
+                textarea.setSelectionRange(start, start + formattedText.length);
+            }
+        }
+
+        function insertText(text) {
+            const textarea = document.getElementById('freeText');
+            const start = textarea.selectionStart;
+            textarea.value = textarea.value.substring(0, start) + text + textarea.value.substring(start);
+            textarea.focus();
+            textarea.setSelectionRange(start + text.length, start + text.length);
+        }
+
+        function clearText() {
+            document.getElementById('freeText').value = '';
+            document.getElementById('freeText').focus();
+        }
+
+        // === PDF GENERATION ===
+        function skapaPDF() {
+            const { jsPDF } = window.jspdf;
+            if (!validateRowData()) return;
+
+            calculateAndSort();
+
+            const date = document.getElementById('date').value || '';
+            const leader = document.getElementById('leader').value || '';
+            const title = document.getElementById('competitionTitle').value || 'Fältskytte';
+            const freeTextContent = document.getElementById('freeText').value.trim();
+            const rows = Array.from(document.getElementById('resultsBody').getElementsByTagName('tr'));
+
+            if (rows.length === 0) {
+                alert('Inga resultat att skapa PDF för!');
+                return;
+            }
+
+            // Always landscape for field shooting (wide table)
+            const doc = new jsPDF('landscape');
+
+            const img = new Image();
+            img.onload = function() {
+                const imgWidth = 200;
+                const imgHeight = (this.height / this.width) * imgWidth;
+                const pageW = doc.internal.pageSize.getWidth();
+                const imgX = (pageW - imgWidth) / 2;
+
+                try { doc.addImage(this, 'JPEG', imgX, 10, imgWidth, imgHeight); } catch(e) { img.onerror(); return; }
+                generatePDFContent(doc, date, leader, title, freeTextContent, rows, imgHeight + 20);
+            };
+
+            img.onerror = function() {
+                generatePDFContent(doc, date, leader, title, freeTextContent, rows, 15);
+            };
+
+            if (customLogoDataUrl) {
+                img.src = customLogoDataUrl;
+            } else {
+                img.onerror();
+                return;
+            }
+        }
+
+        function generatePDFContent(doc, date, leader, title, freeTextContent, rows, startY) {
+            let y = startY;
+
+            const tableX = 10;
+            const tableW = 270;
+
+            doc.setTextColor(0, 100, 200);
+            doc.setFontSize(21);
+            doc.text(title, tableX, y);
+
+            doc.setFontSize(12);
+            doc.text(date, tableX, y + 8);
+
+            const leaderTxt = `Skjutledare: ${leader}`;
+            const leaderW = doc.getTextWidth(leaderTxt);
+            doc.text(leaderTxt, tableX + tableW - leaderW, y + 8);
+
+            y += 20;
+
+            // Collect data grouped by vapengrupp
+            const groups = {};
+            rows.forEach(row => {
+                const data = getRowData(row);
+                if (data.name && data.name.trim()) {
+                    const g = data.group || 'Ingen grupp';
+                    if (!groups[g]) groups[g] = [];
+                    groups[g].push(data);
+                }
+            });
+
+            // Sort within each group by sortValue desc, then sortTie desc
+            Object.keys(groups).forEach(g => {
+                groups[g].sort((a, b) => {
+                    if (b.sortValue !== a.sortValue) return b.sortValue - a.sortValue;
+                    return b.sortTie - a.sortTie;
+                });
+            });
+
+            const totalShooters = Object.values(groups).reduce((sum, arr) => sum + arr.length, 0);
+            const rowSpacing = totalShooters < 15 ? 7.5 : 5;
+            const rectHeight = totalShooters < 15 ? 7.5 : 5;
+
+            doc.setTextColor(0, 0, 0);
+            doc.setLineWidth(0.5);
+
+            // Build column positions for PDF
+            let colPos;
+            if (currentMode === 2) {
+                // Columns: Pl, Name, Group, [Stn1 T, Stn1 M] x 6, Tot Träff, Tot Mål, Sär
+                const stnStart = tableX + 75;
+                const stnWidth = 10;
+                colPos = {
+                    place: tableX + 2,
+                    name: tableX + 12,
+                    group: tableX + 65,
+                    stations: [],
+                    totalT: stnStart + NUM_STATIONS * 2 * stnWidth + 5,
+                    totalM: stnStart + NUM_STATIONS * 2 * stnWidth + 25,
+                    sar: stnStart + NUM_STATIONS * 2 * stnWidth + 45
+                };
+                for (let s = 0; s < NUM_STATIONS; s++) {
+                    colPos.stations.push({
+                        t: stnStart + (s * 2) * stnWidth,
+                        m: stnStart + (s * 2 + 1) * stnWidth
+                    });
+                }
+            } else {
+                // Columns: Pl, Name, Group, [Stn1 T, Stn1 F, Stn1 S] x 6, Träff, Figur, Poäng, Särp
+                const stnStart = tableX + 75;
+                const stnWidth = 9;
+                colPos = {
+                    place: tableX + 2,
+                    name: tableX + 12,
+                    group: tableX + 65,
+                    stations: [],
+                    totalT: stnStart + NUM_STATIONS * 3 * stnWidth + 3,
+                    totalF: stnStart + NUM_STATIONS * 3 * stnWidth + 18,
+                    poang: stnStart + NUM_STATIONS * 3 * stnWidth + 33,
+                    sarp: stnStart + NUM_STATIONS * 3 * stnWidth + 48
+                };
+                for (let s = 0; s < NUM_STATIONS; s++) {
+                    colPos.stations.push({
+                        t: stnStart + (s * 3) * stnWidth,
+                        f: stnStart + (s * 3 + 1) * stnWidth,
+                        s: stnStart + (s * 3 + 2) * stnWidth
+                    });
+                }
+            }
+
+            // Draw header line
+            doc.line(tableX, y - 5, tableX + tableW, y - 5);
+            doc.setFontSize(9);
+            doc.text('Pl.', colPos.place, y);
+            doc.text('Namn', colPos.name, y);
+            doc.text('Grp', colPos.group, y);
+
+            if (currentMode === 2) {
+                for (let s = 0; s < NUM_STATIONS; s++) {
+                    doc.text(`S${s + 1}T`, colPos.stations[s].t, y);
+                    doc.text(`S${s + 1}M`, colPos.stations[s].m, y);
+                }
+                doc.text('Träff', colPos.totalT, y);
+                doc.text('Mål', colPos.totalM, y);
+                doc.text('Sär', colPos.sar, y);
+            } else {
+                for (let s = 0; s < NUM_STATIONS; s++) {
+                    doc.text(`${s + 1}T`, colPos.stations[s].t, y);
+                    doc.text(`${s + 1}F`, colPos.stations[s].f, y);
+                    doc.text(`${s + 1}S`, colPos.stations[s].s, y);
+                }
+                doc.text('Träff', colPos.totalT, y);
+                doc.text('Figur', colPos.totalF, y);
+                doc.text('Poäng', colPos.poang, y);
+                doc.text('Särp', colPos.sarp, y);
+            }
+
+            doc.line(tableX, y + 3, tableX + tableW, y + 3);
+            y += 10;
+
+            const pageLimit = 190;
+            const sortedGroupNames = Object.keys(groups).sort();
+
+            sortedGroupNames.forEach((groupName, groupIndex) => {
+                const groupResults = groups[groupName];
+                if (groupResults.length === 0) return;
+
+                if (groupIndex > 0) y += 5;
+
+                // Group header
+                if (y > pageLimit) { doc.addPage(); y = 20; }
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Grupp ${groupName}`, tableX + 2, y);
+                doc.setFont('helvetica', 'normal');
+                y += rowSpacing;
+
+                groupResults.forEach((result, index) => {
+                    if (y > pageLimit) { doc.addPage(); y = 20; }
+
+                    if (index % 2 === 1) {
+                        doc.setFillColor(245, 245, 245);
+                        doc.rect(tableX, y - 4, tableW, rectHeight, 'F');
+                    }
+
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+
+                    doc.text((index + 1).toString(), colPos.place, y);
+                    doc.text(result.name, colPos.name, y);
+                    doc.text(result.group, colPos.group, y);
+
+                    if (currentMode === 2) {
+                        result.stations.forEach((stn, s) => {
+                            doc.setFont('helvetica', 'normal');
+                            doc.text(stn.t.toString(), colPos.stations[s].t, y);
+                            doc.text(stn.m.toString(), colPos.stations[s].m, y);
+                        });
+
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(result.totalT.toString(), colPos.totalT, y);
+                        doc.text(result.totalM.toString(), colPos.totalM, y);
+                        doc.setFont('helvetica', 'normal');
+                        doc.text(result.sar.toString(), colPos.sar, y);
+                    } else {
+                        result.stations.forEach((stn, s) => {
+                            doc.setFont('helvetica', 'normal');
+                            doc.text(stn.t.toString(), colPos.stations[s].t, y);
+                            doc.text(stn.f.toString(), colPos.stations[s].f, y);
+                            doc.text(stn.s.toString(), colPos.stations[s].s, y);
+                        });
+
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(result.totalT.toString(), colPos.totalT, y);
+                        doc.text(result.totalF.toString(), colPos.totalF, y);
+                        doc.text(result.poang.toString(), colPos.poang, y);
+                        doc.setFont('helvetica', 'normal');
+                        doc.text(result.sarp.toString(), colPos.sarp, y);
+                    }
+
+                    y += rowSpacing;
+                });
+            });
+
+            doc.line(tableX, y - 2, tableX + tableW, y - 2);
+
+            // Free text
+            if (freeTextContent) {
+                y += 15;
+                doc.setFontSize(10);
+                const maxWidth = 250;
+                const textLines = freeTextContent.split('\n');
+
+                textLines.forEach(line => {
+                    let currentText = line.trim();
+
+                    if (!currentText) { y += 12; return; }
+                    if (y > pageLimit) { doc.addPage(); y = 20; }
+
+                    let cleanText = currentText
+                        .replace(/\*\*(.*?)\*\*/g, '$1')
+                        .replace(/\*(.*?)\*/g, '$1')
+                        .replace(/_(.*?)_/g, '$1');
+
+                    doc.setFont('helvetica', 'normal');
+                    const wrappedLines = doc.splitTextToSize(cleanText, maxWidth);
+                    wrappedLines.forEach(wrappedLine => {
+                        if (y > pageLimit) { doc.addPage(); y = 20; }
+                        doc.text(wrappedLine, tableX, y);
+                        y += 6;
+                    });
+                    y += 6;
+                });
+            }
+
+            const filename = `${title.replace(/\s+/g, '_')}_${date}.pdf`;
+            doc.save(filename);
+        }
+
+        // === AUTOSAVE ===
+        const STORAGE_KEY = 'faltskytte_autosave';
+        function autoSave() {
+            try {
+                const data = {
+                    title: document.getElementById('competitionTitle').value,
+                    date: document.getElementById('date').value,
+                    leader: document.getElementById('leader').value,
+                    freeText: document.getElementById('freeText').value,
+                    mode: currentMode,
+                    groupsConfig: document.getElementById('groupsConfig').value,
+                    rows: []
+                };
+                const tbody = document.getElementById('resultsBody');
+                Array.from(tbody.rows).forEach(row => {
+                    const rd = { _inputs: [] };
+                    row.querySelectorAll('input, select').forEach(el => { rd._inputs.push({ cls: el.className, val: el.value }); });
+                    data.rows.push(rd);
+                });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                const s = document.getElementById('saveStatus');
+                if (s) { s.classList.add('show'); setTimeout(() => s.classList.remove('show'), 1500); }
+            } catch(e) {}
+        }
+
+        function autoRestore() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (!saved) return false;
+                const data = JSON.parse(saved);
+                if (!data.rows || data.rows.length === 0) return false;
+
+                document.getElementById('competitionTitle').value = data.title || '';
+                document.getElementById('date').value = data.date || '';
+                document.getElementById('leader').value = data.leader || '';
+                document.getElementById('freeText').value = data.freeText || '';
+
+                if (data.groupsConfig) {
+                    document.getElementById('groupsConfig').value = data.groupsConfig;
+                }
+
+                if (data.mode && (data.mode === 2 || data.mode === 3)) {
+                    currentMode = data.mode;
+                    document.querySelector(`input[name="fieldMode"][value="${currentMode}"]`).checked = true;
+                    updateTableHeader();
+                }
+
+                const tbody = document.getElementById('resultsBody');
+                tbody.innerHTML = '';
+                data.rows.forEach(rd => {
+                    addRow();
+                    const row = tbody.lastElementChild;
+                    const inputs = row.querySelectorAll('input, select');
+                    if (rd._inputs) rd._inputs.forEach((s, i) => { if (inputs[i]) inputs[i].value = s.val; });
+                });
+                Array.from(tbody.rows).forEach(row => {
+                    updateTotals(row);
+                });
+                return true;
+            } catch(e) { return false; }
+        }
+
+        function rensaAllt() {
+            if (!confirm('Vill du rensa alla resultat? Detta går inte att ångra.')) return;
+            localStorage.removeItem(STORAGE_KEY);
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            document.getElementById('competitionTitle').value = 'Fältskytte';
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('leader').value = '';
+            document.getElementById('freeText').value = '';
+            document.getElementById('groupsConfig').value = 'A,C,R';
+            currentMode = 2;
+            document.querySelector('input[name="fieldMode"][value="2"]').checked = true;
+            updateTableHeader();
+            addRow(); addRow();
+        }
+
+        document.addEventListener('input', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
+        document.addEventListener('change', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
+        setTimeout(() => { autoRestore(); }, 100);
+        customLogoDataUrl = localStorage.getItem('customLogo') || null;
+        preloadMembers();
+
+    </script>
+    <div class="autosave-status" id="saveStatus">Sparad</div>
+</body>
+</html>

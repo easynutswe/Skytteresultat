@@ -9,6 +9,7 @@ Webbverktyg for att skapa och skriva ut resultatblad for skyttetavlingar.
 - **Nationell Helmatch** - Resultatblad for nationell helmatch
 - **Milsnabb** - Resultatblad for milsnabb
 - **Precision** - Resultatblad for precision (6 eller 10 serier)
+- **Faltskytte** - Resultatblad for faltskytte/klubbfalt (2 eller 3 varden per station)
 
 ## Funktioner
 
