@@ -484,6 +484,7 @@
             });
 
             nameInput.addEventListener('focus', function() {
+                this.select();
                 if (this.value === '') {
                     isAutoCompleting = false;
                     wasAutoCompleted = false;

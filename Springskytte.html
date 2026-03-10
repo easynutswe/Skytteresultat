@@ -266,7 +266,7 @@
             });
 
             nameInput.addEventListener('blur', function() { setTimeout(() => hideDropdown(), 150); });
-            nameInput.addEventListener('focus', function() { if (this.value === '') { isAutoCompleting = false; wasAutoCompleted = false; originalAutoCompletedValue = ''; } });
+            nameInput.addEventListener('focus', function() { this.select(); if (this.value === '') { isAutoCompleting = false; wasAutoCompleted = false; originalAutoCompletedValue = ''; } });
 
             function showSuggestions(matches) {
                 dropdown.innerHTML = '';
@@ -558,6 +558,7 @@
             timeInput.className = 'time time-input';
             timeInput.placeholder = '0.00';
             timeInput.addEventListener('input', () => updateSpringTotals(row));
+            timeInput.addEventListener('focus', function() { this.select(); });
             timeCell.appendChild(timeInput);
             
             // 6 stationer
@@ -570,6 +571,7 @@
                 stationInput.className = 'station';
                 stationInput.placeholder = '0';
                 stationInput.addEventListener('input', () => updateSpringTotals(row));
+                stationInput.addEventListener('focus', function() { this.select(); });
                 stationCell.appendChild(stationInput);
             }
             
