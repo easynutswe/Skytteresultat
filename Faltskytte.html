@@ -58,6 +58,8 @@
         .stn-odd { background-color: #f0f1f4; }
         .stn-odd input { background-color: #f0f1f4; }
         .stn-s { width: 48px !important; }
+        .stn-sar-col { background-color: #fef3c7; }
+        .stn-sar-col input { background-color: #fef3c7; }
         input { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; box-sizing: border-box; text-align: center; font-size: 13px; font-family: inherit; transition: border-color 0.15s; }
         input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
         input[type="number"] { width: 40px; }
@@ -645,7 +647,7 @@
                 const odd = idx % 2 === 1 ? ' stn-odd' : '';
                 subHtml += `<th class="${odd}">T</th><th class="${odd}">M</th>`;
                 if (sarStations[i]) {
-                    subHtml += `<th class="${odd}">S</th>`;
+                    subHtml += `<th class="${odd} stn-sar-col">S</th>`;
                 }
             });
             headerSub.innerHTML = subHtml;
@@ -749,6 +751,7 @@
                 // Särskiljning (only if enabled, max per config)
                 if (sarStations[s]) {
                     const sTd = document.createElement('td');
+                    sTd.classList.add('stn-sar-col');
                     if (odd) sTd.classList.add('stn-odd');
                     const sInput = createScoreInput('stn-s', getMaxSar(s));
                     sInput.dataset.station = s;
