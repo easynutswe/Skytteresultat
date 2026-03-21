@@ -55,6 +55,9 @@
         th, td { border: 1px solid #e5e7eb; padding: 7px 6px; text-align: center; font-size: 13px; }
         th { background-color: #f8f9fb; font-weight: 600; color: #374151; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; position: sticky; top: 0; z-index: 10; }
         #tableHeaderSub th { top: 30px; }
+        .stn-odd { background-color: #f0f1f4; }
+        .stn-odd input { background-color: #f0f1f4; }
+        .stn-s { width: 48px !important; }
         input { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; box-sizing: border-box; text-align: center; font-size: 13px; font-family: inherit; transition: border-color 0.15s; }
         input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
         input[type="number"] { width: 40px; }
@@ -623,10 +626,11 @@
 
             let topHtml = '<th rowspan="2" style="min-width: 200px;">Namn</th>';
             topHtml += '<th rowspan="2" style="min-width: 80px;">Grupp</th>';
-            active.forEach(i => {
+            active.forEach((i, idx) => {
                 const cols = sarStations[i] ? 3 : 2;
                 const cls = sarStations[i] ? 'station-header-sar' : 'station-header';
-                topHtml += `<th colspan="${cols}" class="${cls}">Stn ${i + 1} (${maxMals[i]})</th>`;
+                const odd = idx % 2 === 1 ? ' stn-odd' : '';
+                topHtml += `<th colspan="${cols}" class="${cls}${odd}">Stn ${i + 1} (${maxMals[i]})</th>`;
             });
             topHtml += '<th rowspan="2" class="total-col">Träff</th>';
             topHtml += '<th rowspan="2" class="total-col">Mål</th>';
@@ -637,10 +641,11 @@
             headerTop.innerHTML = topHtml;
 
             let subHtml = '';
-            active.forEach(i => {
-                subHtml += '<th>T</th><th>M</th>';
+            active.forEach((i, idx) => {
+                const odd = idx % 2 === 1 ? ' stn-odd' : '';
+                subHtml += `<th class="${odd}">T</th><th class="${odd}">M</th>`;
                 if (sarStations[i]) {
-                    subHtml += '<th>S</th>';
+                    subHtml += `<th class="${odd}">S</th>`;
                 }
             });
             headerSub.innerHTML = subHtml;
@@ -724,16 +729,19 @@
 
             // Station inputs (only active stations)
             const active = getActiveStations();
-            active.forEach(s => {
+            active.forEach((s, idx) => {
                 const maxM = getMaxMal(s);
+                const odd = idx % 2 === 1;
                 // Träff (always max 6)
                 const tTd = document.createElement('td');
+                if (odd) tTd.classList.add('stn-odd');
                 const tInput = createScoreInput('stn-t', 6);
                 tInput.dataset.station = s;
                 tTd.appendChild(tInput);
                 row.appendChild(tTd);
                 // Mål (max per station config)
                 const mTd = document.createElement('td');
+                if (odd) mTd.classList.add('stn-odd');
                 const mInput = createScoreInput('stn-m', maxM);
                 mInput.dataset.station = s;
                 mTd.appendChild(mInput);
@@ -741,6 +749,7 @@
                 // Särskiljning (only if enabled, max per config)
                 if (sarStations[s]) {
                     const sTd = document.createElement('td');
+                    if (odd) sTd.classList.add('stn-odd');
                     const sInput = createScoreInput('stn-s', getMaxSar(s));
                     sInput.dataset.station = s;
                     sTd.appendChild(sInput);
