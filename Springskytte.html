@@ -62,8 +62,10 @@
         table { border-collapse: separate; border-spacing: 0; margin-bottom: 20px; }
         th, td { border: 1px solid #e5e7eb; padding: 7px 6px; text-align: center; font-size: 13px; }
         th { background-color: #f8f9fb; font-weight: 600; color: #374151; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; position: sticky; top: 0; z-index: 10; }
-        input { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; box-sizing: border-box; text-align: center; font-size: 13px; font-family: inherit; transition: border-color 0.15s; }
-        input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+        input { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; box-sizing: border-box; text-align: center; font-size: 13px; font-family: inherit; transition: border-color 0.15s, transform 0.15s ease; }
+        input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); transform: scale(2); position: relative; z-index: 20; }
         input[type="number"] { width: 56px; }
         .name-input { width: 200px; text-align: left; }
         .name-input-container { position: relative; width: 200px; }
@@ -577,6 +579,29 @@
             const totalCell = row.insertCell();
             totalCell.className = 'total total-col';
             totalCell.textContent = '0.00';
+
+            // Tab on last station input => add new row or jump to next
+            const stationInputs = row.querySelectorAll('.station');
+            if (stationInputs.length > 0) {
+                const lastInput = stationInputs[stationInputs.length - 1];
+                lastInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                        e.preventDefault();
+                        const currentRow = this.closest('tr');
+                        const allRows = Array.from(tbody.getElementsByTagName('tr'));
+                        const currentIndex = allRows.indexOf(currentRow);
+
+                        if (currentIndex === allRows.length - 1) {
+                            addRow();
+                            const newRow = tbody.lastElementChild;
+                            newRow.querySelector('.name').focus();
+                        } else {
+                            const nextRow = allRows[currentIndex + 1];
+                            nextRow.querySelector('.name').focus();
+                        }
+                    }
+                });
+            }
         }
 
         function updateSpringTotals(row) {
