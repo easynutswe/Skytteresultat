@@ -58,8 +58,9 @@
         th { background-color: #f8f9fb; font-weight: 600; color: #374151; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; position: sticky; top: 0; z-index: 10; }
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
-        input { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; box-sizing: border-box; text-align: center; font-size: 13px; font-family: inherit; transition: border-color 0.15s, transform 0.15s ease; }
-        input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); transform: scale(2); position: relative; z-index: 20; }
+        input, select { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; box-sizing: border-box; text-align: center; font-size: 13px; font-family: inherit; transition: border-color 0.15s, transform 0.15s ease; }
+        input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); transform: scale(2); position: relative; z-index: 20; }
+        .name:focus { transform-origin: left center; }
         input[type="number"] { width: 56px; }
         .name-input { width: 200px; text-align: left; }
         .name-input-container { position: relative; width: 200px; }
