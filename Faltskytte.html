@@ -200,6 +200,10 @@
 
         <div class="buttons">
             <button class="btn-primary" onclick="addRow()">Lägg till rad</button>
+            <select id="sortMode" style="padding:6px 10px; border-radius:4px; border:1px solid #ccc; font-size:14px;">
+                <option value="poangfalt">Poängfält</option>
+                <option value="traffalt">Träffält</option>
+            </select>
             <button class="btn-calc" onclick="calculateAndSort()">Beräkna &amp; Sortera</button>
             <button class="btn-csv" onclick="saveToFile()">Spara CSV</button>
             <input type="file" id="fileInput" accept=".csv" onchange="loadFile(event)" style="display: none;">
@@ -896,12 +900,22 @@
                 return nameInput && nameInput.value.trim() !== '';
             });
 
+            const mode = document.getElementById('sortMode').value;
+
             const sortedRows = nonEmptyRows.sort((a, b) => {
                 const dataA = getRowData(a);
                 const dataB = getRowData(b);
 
                 const groupDiff = dataA.group.localeCompare(dataB.group);
                 if (groupDiff !== 0) return groupDiff;
+
+                if (mode === 'traffalt') {
+                    const traffDiff = dataB.totalT - dataA.totalT;
+                    if (traffDiff !== 0) return traffDiff;
+                    const maalDiff = dataB.totalM - dataA.totalM;
+                    if (maalDiff !== 0) return maalDiff;
+                    return dataB.totalS - dataA.totalS;
+                }
 
                 const valueDiff = dataB.sortValue - dataA.sortValue;
                 if (valueDiff !== 0) return valueDiff;
@@ -1207,8 +1221,14 @@
                 }
             });
 
+            const pdfMode = document.getElementById('sortMode').value;
             Object.keys(groups).forEach(g => {
                 groups[g].sort((a, b) => {
+                    if (pdfMode === 'traffalt') {
+                        if (b.totalT !== a.totalT) return b.totalT - a.totalT;
+                        if (b.totalM !== a.totalM) return b.totalM - a.totalM;
+                        return b.totalS - a.totalS;
+                    }
                     if (b.sortValue !== a.sortValue) return b.sortValue - a.sortValue;
                     return b.sortTie - a.sortTie;
                 });
