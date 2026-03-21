@@ -258,7 +258,7 @@
 
             nameInput.addEventListener('input', function() {
                 if (isAutoCompleting) { isAutoCompleting = false; return; }
-                if (wasAutoCompleted && this.value !== originalAutoCompletedValue) { hideDropdown(); return; }
+                if (wasAutoCompleted && this.value !== originalAutoCompletedValue) { wasAutoCompleted = false; originalAutoCompletedValue = ''; }
                 const query = this.value.toLowerCase().trim();
                 currentHighlightIndex = -1;
                 if (query.length === 0 || preloadedMembers.length === 0) { hideDropdown(); return; }
@@ -376,8 +376,7 @@
                 }
 
                 if (wasAutoCompleted && this.value !== originalAutoCompletedValue) {
-                    hideDropdown();
-                    return;
+                    wasAutoCompleted = false; originalAutoCompletedValue = '';
                 }
 
                 const query = this.value.trim();

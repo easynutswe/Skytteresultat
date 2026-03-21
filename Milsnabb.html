@@ -249,8 +249,7 @@
                 }
 
                 if (wasAutoCompleted && this.value !== originalAutoCompletedValue) {
-                    hideDropdown();
-                    return;
+                    wasAutoCompleted = false; originalAutoCompletedValue = '';
                 }
 
                 const query = this.value.toLowerCase().trim();
@@ -408,8 +407,7 @@
                 }
 
                 if (wasAutoCompleted && this.value !== originalAutoCompletedValue) {
-                    hideDropdown();
-                    return;
+                    wasAutoCompleted = false; originalAutoCompletedValue = '';
                 }
 
                 const query = this.value.trim();
