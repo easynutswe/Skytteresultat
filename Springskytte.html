@@ -106,6 +106,14 @@
             <p>Fyll i namn, grupp, bana, vapen och löptid. För varje station: ange antal träffar av 5 skott (0–5). Missar och strafftid räknas automatiskt.</p>
         </div>
 
+        <div class="setup-row" style="grid-template-columns: 1fr;">
+            <div class="setup-box">
+                <h4>Banor</h4>
+                <p>Kommaseparerade bannamn</p>
+                <input type="text" id="courseConfig" class="groups-input" value="L,K" onchange="updateCourseOptions()" style="width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; font-size: 13px;">
+            </div>
+        </div>
+
                 <div class="meta-row">
             <div class="meta-fields">
                 <input type="text" id="competitionTitle" placeholder="Tävlingsnamn" value="Springskytte">
@@ -193,6 +201,30 @@
         ];
 
         document.getElementById('date').valueAsDate = new Date();
+
+        function getCourseOptions() {
+            const val = document.getElementById('courseConfig').value.trim();
+            if (!val) return ['L', 'K'];
+            return val.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        }
+
+        function updateCourseOptions() {
+            const options = getCourseOptions();
+            const selects = document.querySelectorAll('#resultsBody .course');
+            selects.forEach(sel => {
+                const current = sel.value;
+                sel.innerHTML = '';
+                options.forEach(opt => {
+                    const o = document.createElement('option');
+                    o.value = opt;
+                    o.textContent = opt;
+                    sel.appendChild(o);
+                });
+                if (options.includes(current)) {
+                    sel.value = current;
+                }
+            });
+        }
 
         function capitalizeName(str) {
             if (!str) return str;
@@ -533,7 +565,7 @@
             const courseCell = row.insertCell();
             const courseSelect = document.createElement('select');
             courseSelect.className = 'course group-select';
-            ['L', 'K'].forEach(opt => {
+            getCourseOptions().forEach(opt => {
                 const option = document.createElement('option');
                 option.value = opt;
                 option.textContent = opt;
@@ -984,7 +1016,7 @@
         const STORAGE_KEY = 'springskytte_autosave';
         function autoSave() {
             try {
-                const data = { title: document.getElementById('competitionTitle').value, date: document.getElementById('date').value, leader: document.getElementById('leader').value, freeText: document.getElementById('freeText').value, rows: [] };
+                const data = { title: document.getElementById('competitionTitle').value, date: document.getElementById('date').value, leader: document.getElementById('leader').value, freeText: document.getElementById('freeText').value, courseConfig: document.getElementById('courseConfig').value, rows: [] };
                 const tbody = document.getElementById('resultsBody');
                 Array.from(tbody.rows).forEach(row => {
                     const rd = { _inputs: [] };
@@ -1006,6 +1038,7 @@
                 document.getElementById('date').value = data.date || '';
                 document.getElementById('leader').value = data.leader || '';
                 document.getElementById('freeText').value = data.freeText || '';
+                if (data.courseConfig) document.getElementById('courseConfig').value = data.courseConfig;
                 const tbody = document.getElementById('resultsBody'); tbody.innerHTML = '';
                 data.rows.forEach(rd => {
                     addRow();
