@@ -2,105 +2,16 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultatmall Springskytte</title>
+    <link rel="stylesheet" href="shared.css">
     <script src="jspdf.umd_.min_.js"></script>
-    <div id="submitModal">
-        <h3>Skicka resultat</h3>
-        <p>1. Filerna har sparats i din Downloads-mapp</p>
-        <p>2. Skicka filerna till ansvarig</p>
-        <button class="btn-primary" onclick="closeModal()">OK</button>
-    </div>
-    <div class="modal-backdrop" onclick="closeModal()"></div>
-
     <script>if(!window.jspdf){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>')}</script>
-    <style>
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            margin: 0; padding: 20px;
-            background-color: #f4f6f8; color: #1a1a2e;
-        }
-        .container {
-            width: 1750px; margin: 0;
-            background-color: white; padding: 24px 24px 200px 24px;
-            border-radius: 0; box-shadow: none; min-height: 100vh;
-        }
-        .page-title { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; margin: 0 0 20px 0; letter-spacing: -0.02em; }
-        .instructions { background-color: #f8f9fb; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e8ecf0; }
-        .instructions h3 { margin: 0 0 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 600; }
-        .instructions p { margin: 4px 0; line-height: 1.5; font-size: 13px; color: #4a5568; }
-        .setup-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .setup-box { background-color: #f0f7ff; padding: 14px 16px; border-radius: 8px; border: 1px solid #c7ddf5; }
-        .setup-box h4 { margin: 0 0 6px 0; color: #1a5276; font-size: 13px; font-weight: 600; }
-        .setup-box p { margin: 0 0 6px 0; font-size: 12px; color: #5a6778; }
-        .setup-box--neutral { background-color: #f8f9fb; border-color: #e8ecf0; min-height: 60px; }
-        .setup-box--neutral h4 { color: #1a1a2e; }
-        .setup-box label { font-size: 13px; cursor: pointer; display: block; margin: 4px 0; }
-        .members-count { font-size: 12px; color: #666; margin-left: 10px; }
-        .logo-preview { max-width: 200px; max-height: 80px; margin-top: 8px; border: 1px solid #e0e0e0; padding: 4px; background: white; border-radius: 4px; }
-        .meta-row { display: flex; gap: 16px; margin-bottom: 20px; }
-        .meta-fields { display: flex; flex-direction: column; gap: 8px; min-width: 220px; }
-        .meta-fields input { padding: 10px 12px; border: 1px solid #d0d5dd; border-radius: 8px; font-size: 14px; font-family: inherit; }
-        .meta-fields input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        .meta-freetext { flex: 1; display: flex; flex-direction: column; }
-        .meta-freetext textarea { flex: 1; min-height: 0; padding: 10px; border: 1px solid #d0d5dd; border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical; }
-        .meta-freetext textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        .editor-toolbar { display: flex; gap: 4px; margin-bottom: 8px; align-items: center; }
-        .editor-toolbar button { padding: 5px 10px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: background 0.15s; }
-        .editor-toolbar button:hover { background-color: #5a6268; }
-        .toolbar-label { font-size: 12px; font-weight: 600; color: #5a6778; margin-right: 6px; align-self: center; }
-        .toolbar-sep { width: 1px; height: 18px; background: #d0d5dd; align-self: center; margin: 0 2px; }
-        .buttons { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        button { padding: 9px 18px; font-size: 13px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
-        button:active { transform: scale(0.97); }
-        .btn-primary { background-color: #22c55e; color: white; } .btn-primary:hover { background-color: #16a34a; }
-        .btn-calc { background-color: #3b82f6; color: white; } .btn-calc:hover { background-color: #2563eb; }
-        .btn-csv { background-color: #64748b; color: white; } .btn-csv:hover { background-color: #475569; }
-        .btn-load { background-color: #8b5cf6; color: white; } .btn-load:hover { background-color: #7c3aed; }
-        .btn-submit { background-color: #0ea5e9; color: white; } .btn-submit:hover { background-color: #0284c7; }
-        .btn-pdf { background-color: #ef4444; color: white; } .btn-pdf:hover { background-color: #dc2626; }
-        .btn-clear { background-color: #374151; color: white; } .btn-clear:hover { background-color: #1f2937; }
-        table { border-collapse: separate; border-spacing: 0; margin-bottom: 20px; }
-        th, td { border: 1px solid #e5e7eb; padding: 7px 6px; text-align: center; font-size: 13px; }
-        th { background-color: #f8f9fb; font-weight: 600; color: #374151; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; position: sticky; top: 0; z-index: 10; }
-        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type="number"] { -moz-appearance: textfield; }
-        input, select { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; box-sizing: border-box; text-align: center; font-size: 13px; font-family: inherit; transition: border-color 0.15s, transform 0.15s ease; }
-        input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); transform: scale(2); position: relative; z-index: 20; }
-        .name:focus, .meta-fields input:focus { transform-origin: left center; }
-        input[type="number"] { width: 56px; }
-        .name-input { width: 200px; text-align: left; }
-        .name-input-container { position: relative; width: 200px; }
-        .suggestions-dropdown { position: fixed; background: white; border: 1px solid #3b82f6; border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 10000; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-        .suggestion-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 13px; text-align: left; line-height: 1.3; transition: background 0.1s; }
-        .suggestion-item:hover, .suggestion-item.highlighted { background-color: #eff6ff; color: #1d4ed8; }
-        .suggestion-item:last-child { border-bottom: none; }
-        .weapon-input { width: 100%; box-sizing: border-box; }
-        .weapon-cell { width: 90px; max-width: 90px; }
-        .weapon-cell .name-input-container { width: 100%; }
-        .time-input { width: 80px; }
-        .group-select { width: 100px; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 6px; background-color: white; cursor: pointer; font-size: 13px; font-family: inherit; }
-        .group-select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
-        .total-col { background-color: #ecfdf5 !important; font-weight: 700; color: #065f46; }
-        .summary-col { background-color: #f8fafc !important; font-weight: 600; color: #334155; }
-        .station-header { background-color: #f1f5f9 !important; }
-        .error { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
-        .perfect-score { color: #dc2626 !important; font-weight: bold !important; background-color: #fef9c3 !important; }
-        #submitModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 24px; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); z-index: 1000; max-width: 500px; width: 90%; }
-        #submitModal h3 { margin: 0 0 12px 0; font-size: 1.1rem; }
-        #submitModal p { margin: 4px 0; font-size: 13px; color: #4a5568; }
-        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); z-index: 999; }
-        .autosave-status { position: fixed; bottom: 12px; right: 16px; font-size: 11px; color: #9ca3af; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
-        .autosave-status.show { opacity: 1; }
-        .metadata .name-input-container { width: 100%; }
-        .metadata .name-input-container input { width: 100%; }
-        @media (max-width: 900px) { .setup-row { grid-template-columns: 1fr; } }
-
-    </style>
 </head>
 <body>
     <div class="container">
         <h1 class="page-title">Resultatmall Springskytte</h1>
-        
+
         <div class="instructions">
             <h3>Springskytte</h3>
             <p>Fyll i namn, grupp, bana, vapen och löptid. För varje station: ange antal träffar av 5 skott (0–5). Missar och strafftid räknas automatiskt.</p>
@@ -116,7 +27,7 @@
 
                 <div class="meta-row">
             <div class="meta-fields">
-                <input type="text" id="competitionTitle" placeholder="Tävlingsnamn" value="Springskytte">
+                <input type="text" id="competitionTitle" placeholder="Tävlingsnamn" value="Springskytte" onblur="this.value = capitalizeFirstLetter(this.value)">
                 <input type="date" id="date" class="date-input">
                 <div class="name-input-container" style="width: 100%;">
                 <input type="text" id="leader" placeholder="Skjutledare" onblur="this.value = capitalizeName(this.value)">
@@ -139,7 +50,7 @@
             </div>
         </div>
 
-        
+
 
         <div class="buttons">
             <button class="btn-primary" onclick="addRow()">Lägg till rad</button>
@@ -181,26 +92,56 @@
 
     <div id="submitModal">
         <h3>Skicka resultat</h3>
-        <p>1. Filerna har sparats i din Downloads-mapp</p>
-        <p>2. Skicka filerna till ansvarig</p>
-        <button class="btn-primary" onclick="closeModal()">OK</button>
+        <p>1. Filerna har sparats i din Downloads-mapp:</p>
+        <p>&nbsp;&nbsp;&nbsp;• "[tävlingsnamn]_[datum].csv"</p>
+        <p>&nbsp;&nbsp;&nbsp;• "[tävlingsnamn]_[datum].pdf"</p>
+        <p>2. Skicka BÅDA filerna (.csv och .pdf) till ansvarig</p>
+        <button onclick="closeModal()">OK</button>
     </div>
     <div class="modal-backdrop" onclick="closeModal()"></div>
 
     <script>
+        // Config for shared.js
+        const DISCIPLINE_NAME = 'Springskytte';
+        const STORAGE_KEY = 'springskytte_autosave';
         let preloadedMembers = [];
         let customLogoDataUrl = null;
-        
         // Vapenförkortningar för .22-vapen (vapengrupp C) som används i springskytte
         const weaponAbbreviations = [
-            'Bn', 'C38', 'Er', 'FAS', 'Pa', 'Hä38', 'Hä', 'MG', 'Mo', 'SAKO', 'SW38', 
-            'Te', 'Un', 'GSP', 'Ad', 'Ar', 'As', 'Ba', 'Be', 'Br', 'Bw', 'Ci', 'C', 
-            'CZ', 'Do', 'Fe', 'FN', 'HS', 'Mi', 'SW22R', 'UHL', 'Vo', 'W', 'SSP', 
+            'Bn', 'C38', 'Er', 'FAS', 'Pa', 'Hä38', 'Hä', 'MG', 'Mo', 'SAKO', 'SW38',
+            'Te', 'Un', 'GSP', 'Ad', 'Ar', 'As', 'Ba', 'Be', 'Br', 'Bw', 'Ci', 'C',
+            'CZ', 'Do', 'Fe', 'FN', 'HS', 'Mi', 'SW22R', 'UHL', 'Vo', 'W', 'SSP',
             'Ruger', 'Hammerli', 'Pardini', 'Unique', 'Walther', 'Browning', 'Benelli',
             'Beretta', 'Morini', 'GSP', 'CZ75', 'S&W22', 'Ruger22'
         ];
+    </script>
+    <script src="shared.js"></script>
+    <script>
+        // Discipline-specific code
 
-        document.getElementById('date').valueAsDate = new Date();
+        document.addEventListener('DOMContentLoaded', () => {
+            addRow();
+            addRow();
+            const today = new Date();
+            const todayString = today.toISOString().split('T')[0];
+            document.getElementById('date').value = todayString;
+        });
+
+        // === Autosave hooks ===
+
+        function getExtraAutoSaveData() {
+            return { courseConfig: document.getElementById('courseConfig').value };
+        }
+
+        function restoreExtraAutoSaveData(data) {
+            if (data.courseConfig) document.getElementById('courseConfig').value = data.courseConfig;
+        }
+
+        function resetExtraFields() {
+            document.getElementById('courseConfig').value = 'L,K';
+        }
+
+        // === Course options ===
 
         function getCourseOptions() {
             const val = document.getElementById('courseConfig').value.trim();
@@ -226,298 +167,12 @@
             });
         }
 
-        function capitalizeName(str) {
-            if (!str) return str;
-            return str.replace(/(^|\s)[a-zA-ZåäöÅÄÖ]/g, function(match) {
-                return match.toUpperCase();
-            });
-        }
-
-        function preloadMembers() {
-            try {
-                const saved = localStorage.getItem('membersList');
-                if (saved) {
-                    const lines = JSON.parse(saved);
-                    preloadedMembers = lines.map(name => capitalizeName(name));
-                }
-            } catch(e) {}
-        }
-
-        function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
-            const container = nameInput.parentElement;
-            let dropdown = container.querySelector('.suggestions-dropdown');
-            if (!dropdown) {
-                dropdown = document.createElement('div');
-                dropdown.className = 'suggestions-dropdown';
-                container.appendChild(dropdown);
-            }
-            let currentHighlightIndex = -1;
-            let isAutoCompleting = false;
-            let wasAutoCompleted = false;
-            let originalAutoCompletedValue = '';
-
-            nameInput.addEventListener('input', function() {
-                if (isAutoCompleting) { isAutoCompleting = false; return; }
-                if (wasAutoCompleted && this.value !== originalAutoCompletedValue) { wasAutoCompleted = false; originalAutoCompletedValue = ''; }
-                const query = this.value.toLowerCase().trim();
-                currentHighlightIndex = -1;
-                if (query.length === 0 || preloadedMembers.length === 0) { hideDropdown(); return; }
-                const exactMatches = preloadedMembers.filter(name => name.toLowerCase().startsWith(query));
-                const partialMatches = preloadedMembers.filter(name => name.toLowerCase().includes(query) && !name.toLowerCase().startsWith(query));
-                const allMatches = [...exactMatches, ...partialMatches];
-                if (allMatches.length === 0) { hideDropdown(); return; }
-                if (allMatches.length === 1 && exactMatches.length === 1) {
-                    isAutoCompleting = true; wasAutoCompleted = true; originalAutoCompletedValue = allMatches[0];
-                    const currentValue = allMatches[0];
-                    setTimeout(() => {
-                        this.value = currentValue; hideDropdown();
-                        if (isLeaderField) { const f = document.getElementById('freeText'); if (f) f.focus(); }
-                        else { const row = this.closest('tr'); const g = row ? row.querySelector('.group') : null; if (g) g.focus(); }
-                    }, 100);
-                    return;
-                }
-                showSuggestions(allMatches.slice(0, 6));
-            });
-
-            nameInput.addEventListener('keydown', function(e) {
-                const items = dropdown.querySelectorAll('.suggestion-item');
-                if (e.key === 'ArrowDown') { e.preventDefault(); currentHighlightIndex = Math.min(currentHighlightIndex + 1, items.length - 1); updateHighlight(); }
-                else if (e.key === 'ArrowUp') { e.preventDefault(); currentHighlightIndex = Math.max(currentHighlightIndex - 1, -1); updateHighlight(); }
-                else if (e.key === 'Enter') { e.preventDefault(); if (currentHighlightIndex >= 0 && items[currentHighlightIndex]) selectSuggestion(items[currentHighlightIndex].textContent); }
-                else if (e.key === 'Escape') { hideDropdown(); }
-                else if (e.key === 'Tab') { hideDropdown(); }
-            });
-
-            nameInput.addEventListener('blur', function() { setTimeout(() => hideDropdown(), 150); });
-            nameInput.addEventListener('focus', function() { this.select(); if (this.value === '') { isAutoCompleting = false; wasAutoCompleted = false; originalAutoCompletedValue = ''; } });
-
-            function showSuggestions(matches) {
-                dropdown.innerHTML = '';
-                matches.forEach(name => {
-                    const item = document.createElement('div');
-                    item.className = 'suggestion-item';
-                    item.textContent = name;
-                    item.addEventListener('click', () => selectSuggestion(name));
-                    dropdown.appendChild(item);
-                });
-                dropdown.style.display = 'block';
-                setTimeout(() => {
-                    const inputRect = nameInput.getBoundingClientRect();
-                    const dropdownHeight = dropdown.offsetHeight;
-                    dropdown.style.left = inputRect.left + 'px';
-                    dropdown.style.width = inputRect.width + 'px';
-                    dropdown.style.top = (inputRect.top - dropdownHeight - 5) + 'px';
-                }, 0);
-            }
-
-            function hideDropdown() { dropdown.style.display = 'none'; currentHighlightIndex = -1; }
-            function updateHighlight() { dropdown.querySelectorAll('.suggestion-item').forEach((item, i) => { item.classList.toggle('highlighted', i === currentHighlightIndex); }); }
-            function selectSuggestion(name) {
-                isAutoCompleting = true; wasAutoCompleted = true; originalAutoCompletedValue = name;
-                nameInput.value = name; hideDropdown(); nameInput.dispatchEvent(new Event('change'));
-                setTimeout(() => {
-                    if (isLeaderField) { const f = document.getElementById('freeText'); if (f) f.focus(); }
-                    else { const row = nameInput.closest('tr'); const g = row ? row.querySelector('.group') : null; if (g) g.focus(); }
-                }, 50);
-            }
-        }
-
-        // Fritextformatering
-        function formatText(command) {
-            const textarea = document.getElementById('freeText');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const selectedText = textarea.value.substring(start, end);
-            
-            if (selectedText.length === 0) {
-                alert('Markera text först innan du formaterar');
-                return;
-            }
-            
-            let formattedText;
-            switch(command) {
-                case 'bold':
-                    formattedText = `**${selectedText}**`;
-                    break;
-                case 'italic':
-                    formattedText = `*${selectedText}*`;
-                    break;
-                case 'underline':
-                    formattedText = `_${selectedText}_`;
-                    break;
-                default:
-                    formattedText = selectedText;
-            }
-            
-            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
-            textarea.focus();
-            textarea.setSelectionRange(start, start + formattedText.length);
-        }
-
-        function setupWeaponInputWithSuggestions(weaponInput) {
-            const container = weaponInput.parentElement;
-            let dropdown = container.querySelector('.suggestions-dropdown');
-            
-            if (!dropdown) {
-                dropdown = document.createElement('div');
-                dropdown.className = 'suggestions-dropdown';
-                container.appendChild(dropdown);
-            }
-
-            let currentHighlightIndex = -1;
-            let isAutoCompleting = false;
-            let wasAutoCompleted = false;
-            let originalAutoCompletedValue = '';
-
-            weaponInput.addEventListener('input', function() {
-                if (isAutoCompleting) {
-                    isAutoCompleting = false;
-                    return;
-                }
-
-                if (wasAutoCompleted && this.value !== originalAutoCompletedValue) {
-                    wasAutoCompleted = false; originalAutoCompletedValue = '';
-                }
-
-                const query = this.value.trim();
-                currentHighlightIndex = -1;
-                
-                if (query.length === 0) {
-                    hideDropdown();
-                    return;
-                }
-
-                const exactMatches = weaponAbbreviations.filter(weapon => 
-                    weapon.toLowerCase().startsWith(query.toLowerCase())
-                );
-                const partialMatches = weaponAbbreviations.filter(weapon => 
-                    weapon.toLowerCase().includes(query.toLowerCase()) && !weapon.toLowerCase().startsWith(query.toLowerCase())
-                );
-                
-                const sortedExactMatches = exactMatches.sort((a, b) => {
-                    if (a.toLowerCase() === query.toLowerCase()) return -1;
-                    if (b.toLowerCase() === query.toLowerCase()) return 1;
-                    return a.length - b.length;
-                });
-                
-                const allMatches = [...sortedExactMatches, ...partialMatches];
-                
-                if (allMatches.length === 0) {
-                    hideDropdown();
-                    return;
-                }
-
-                if (allMatches.length === 1 && exactMatches.length === 1 && exactMatches[0].toLowerCase() === query.toLowerCase()) {
-                    isAutoCompleting = true;
-                    wasAutoCompleted = true;
-                    originalAutoCompletedValue = allMatches[0];
-                    this.value = allMatches[0];
-                    hideDropdown();
-                    
-                    setTimeout(() => {
-                        const row = this.closest('tr');
-                        const firstTime = row.querySelector('.time');
-                        if (firstTime) {
-                            firstTime.focus();
-                        }
-                    }, 50);
-                    return;
-                }
-
-                showSuggestions(allMatches.slice(0, 6));
-            });
-
-            weaponInput.addEventListener('keydown', function(e) {
-                const suggestionItems = dropdown.querySelectorAll('.suggestion-item');
-                
-                if (suggestionItems.length > 0) {
-                    if (e.key === 'ArrowDown') {
-                        e.preventDefault();
-                        currentHighlightIndex = (currentHighlightIndex + 1) % suggestionItems.length;
-                        updateHighlight();
-                    } else if (e.key === 'ArrowUp') {
-                        e.preventDefault();
-                        currentHighlightIndex = currentHighlightIndex <= 0 ? suggestionItems.length - 1 : currentHighlightIndex - 1;
-                        updateHighlight();
-                    } else if (e.key === 'Enter' && currentHighlightIndex >= 0) {
-                        e.preventDefault();
-                        selectSuggestion(suggestionItems[currentHighlightIndex].textContent);
-                    }
-                } else if (e.key === 'Escape') {
-                    hideDropdown();
-                } else if (e.key === 'Tab') {
-                    hideDropdown();
-                }
-            });
-
-            weaponInput.addEventListener('blur', function() {
-                setTimeout(() => hideDropdown(), 150);
-            });
-
-            weaponInput.addEventListener('focus', function() {
-                if (this.value === '') {
-                    isAutoCompleting = false;
-                    wasAutoCompleted = false;
-                    originalAutoCompletedValue = '';
-                }
-            });
-
-            function showSuggestions(matches) {
-                dropdown.innerHTML = '';
-                
-                matches.forEach(weapon => {
-                    const item = document.createElement('div');
-                    item.className = 'suggestion-item';
-                    item.textContent = weapon;
-                    item.addEventListener('click', () => selectSuggestion(weapon));
-                    dropdown.appendChild(item);
-                });
-                
-                dropdown.style.display = 'block';
-                
-                setTimeout(() => {
-                    const inputRect = weaponInput.getBoundingClientRect();
-                    const dropdownHeight = dropdown.offsetHeight;
-                    dropdown.style.left = inputRect.left + 'px';
-                    dropdown.style.width = inputRect.width + 'px';
-                    dropdown.style.top = (inputRect.top - dropdownHeight - 5) + 'px';
-                }, 0);
-            }
-
-            function hideDropdown() {
-                dropdown.style.display = 'none';
-                currentHighlightIndex = -1;
-            }
-
-            function updateHighlight() {
-                const suggestionItems = dropdown.querySelectorAll('.suggestion-item');
-                suggestionItems.forEach((item, index) => {
-                    item.classList.toggle('highlighted', index === currentHighlightIndex);
-                });
-            }
-
-            function selectSuggestion(weapon) {
-                isAutoCompleting = true;
-                wasAutoCompleted = true;
-                originalAutoCompletedValue = weapon;
-                weaponInput.value = weapon;
-                hideDropdown();
-                weaponInput.dispatchEvent(new Event('change'));
-                
-                setTimeout(() => {
-                    const row = weaponInput.closest('tr');
-                    const firstTime = row.querySelector('.time');
-                    if (firstTime) {
-                        firstTime.focus();
-                    }
-                }, 50);
-            }
-        }
+        // === Row management ===
 
         function addRow() {
             const tbody = document.getElementById('resultsBody');
             const row = tbody.insertRow();
-            
+
             // Namn
             const nameCell = row.insertCell();
             const nameContainer = document.createElement('div');
@@ -532,7 +187,7 @@
             nameContainer.appendChild(nameInput);
             nameCell.appendChild(nameContainer);
             setupNameInputWithSuggestions(nameInput);
-            
+
             // Grupp
             const groupCell = row.insertCell();
             const groupSelect = document.createElement('select');
@@ -544,7 +199,7 @@
                 groupSelect.appendChild(option);
             });
             groupCell.appendChild(groupSelect);
-            
+
             // Vapen
             const weaponCell = row.insertCell();
             weaponCell.className = 'weapon-cell';
@@ -557,9 +212,9 @@
             weaponInput.maxLength = 15;
             weaponContainer.appendChild(weaponInput);
             weaponCell.appendChild(weaponContainer);
-            
+
             setupWeaponInputWithSuggestions(weaponInput);
-            
+
             // Bana
             const courseCell = row.insertCell();
             const courseSelect = document.createElement('select');
@@ -571,7 +226,7 @@
                 courseSelect.appendChild(option);
             });
             courseCell.appendChild(courseSelect);
-            
+
             // Löptid
             const timeCell = row.insertCell();
             const timeInput = document.createElement('input');
@@ -582,7 +237,7 @@
             timeInput.addEventListener('input', () => updateSpringTotals(row));
             timeInput.addEventListener('focus', function() { this.select(); });
             timeCell.appendChild(timeInput);
-            
+
             // 6 stationer
             for (let i = 0; i < 6; i++) {
                 const stationCell = row.insertCell();
@@ -596,17 +251,17 @@
                 stationInput.addEventListener('focus', function() { this.select(); });
                 stationCell.appendChild(stationInput);
             }
-            
+
             // Missar
             const missCell = row.insertCell();
             missCell.className = 'missar';
             missCell.textContent = '0';
-            
+
             // Strafftid
             const penaltyCell = row.insertCell();
             penaltyCell.className = 'penalty';
             penaltyCell.textContent = '0.00';
-            
+
             // Total tid
             const totalCell = row.insertCell();
             totalCell.className = 'total total-col';
@@ -636,61 +291,97 @@
             }
         }
 
+        // === Calculations ===
+
         function updateSpringTotals(row) {
             const stations = Array.from(row.querySelectorAll('.station'));
             const totalHits = stations.reduce((sum, input) => sum + (parseInt(input.value) || 0), 0);
             const misses = 30 - totalHits;
-            
+
             row.querySelector('.missar').textContent = misses;
-            
+
             const penaltyTime = misses * 1.0;
             row.querySelector('.penalty').textContent = penaltyTime.toFixed(2);
-            
+
             const runTime = parseFloat(row.querySelector('.time').value) || 0;
             const totalTime = runTime + penaltyTime;
             row.querySelector('.total').textContent = totalTime.toFixed(2);
         }
 
+        function validateRowData() {
+            const rows = Array.from(document.getElementById('resultsBody').getElementsByTagName('tr'));
+            let hasErrors = false;
+
+            rows.forEach(row => {
+                const nameInput = row.querySelector('.name');
+                const timeInput = row.querySelector('.time');
+
+                if (nameInput) nameInput.classList.remove('error');
+                if (timeInput) timeInput.classList.remove('error');
+
+                if (nameInput && nameInput.value.trim() !== '' && timeInput) {
+                    const timeVal = parseFloat(timeInput.value);
+                    if (!timeVal || timeVal <= 0) {
+                        timeInput.classList.add('error');
+                        hasErrors = true;
+                    }
+                }
+            });
+
+            if (hasErrors) {
+                alert('Fel: Alla deltagare med namn måste ha en löptid ifylld!');
+                return false;
+            }
+
+            return true;
+        }
+
         function calculateAndSort() {
+            if (!validateRowData()) {
+                return;
+            }
+
             const rows = Array.from(document.getElementById('resultsBody').rows);
-            
+
             rows.forEach(row => {
                 updateSpringTotals(row);
             });
-            
+
             const filledRows = rows.filter(row => row.querySelector('.name').value.trim() !== '');
             const emptyRows = rows.filter(row => row.querySelector('.name').value.trim() === '');
-            
+
             filledRows.sort((a, b) => {
                 const courseA = a.querySelector('.course').value;
                 const courseB = b.querySelector('.course').value;
                 if (courseA !== courseB) return courseA.localeCompare(courseB);
-                
+
                 const groupA = a.querySelector('.group').value;
                 const groupB = b.querySelector('.group').value;
                 if (groupA !== groupB) return groupA.localeCompare(groupB);
-                
+
                 const totalA = parseFloat(a.querySelector('.total').textContent);
                 const totalB = parseFloat(b.querySelector('.total').textContent);
                 return totalA - totalB;
             });
-            
+
             const tbody = document.getElementById('resultsBody');
             tbody.innerHTML = '';
             filledRows.forEach(row => tbody.appendChild(row));
             emptyRows.forEach(row => tbody.appendChild(row));
         }
 
+        // === CSV save/load ===
+
         function saveCSV() {
             const title = document.getElementById('competitionTitle').value || 'Springskytte';
             const date = document.getElementById('date').value;
             const leader = document.getElementById('leader').value;
-            
+
             let csv = '\uFEFF';
             const freeText = document.getElementById('freeText').value;
             csv += `${title};${date};${leader};${freeText.replace(/\n/g, '\\n')}\n`;
             csv += 'Namn;Grupp;Bana;Vapen;Löptid;St1;St2;St3;St4;St5;St6;Missar;Strafftid;Total\n';
-            
+
             const rows = document.getElementById('resultsBody').rows;
             for (let row of rows) {
                 const name = row.querySelector('.name').value;
@@ -703,248 +394,20 @@
                     const misses = row.querySelector('.missar').textContent;
                     const penalty = row.querySelector('.penalty').textContent;
                     const total = row.querySelector('.total').textContent;
-                    
+
                     csv += `${name};${group};${course};${weapon};${time};${stations.join(';')};${misses};${penalty};${total}\n`;
                 }
             }
-            
+
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${title.replace(/\s+/g, '_')}_${date}.csv`;
+            const sanitizedTitle = title.replace(/[^a-zA-Z0-9åäöÅÄÖ]/g, '_');
+            a.download = `${sanitizedTitle}_${date}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         }
-
-        function skapaPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape');
-            
-            const title = document.getElementById('competitionTitle').value || 'Springskytte';
-            const date = document.getElementById('date').value;
-            const leader = document.getElementById('leader').value;
-            const freeTextContent = document.getElementById('freeText').value.trim();
-            
-            const img = new Image();
-            img.onload = function() {
-                const maxHeight = 60;
-                let imgWidth = 200;
-                let imgHeight = (this.height / this.width) * imgWidth;
-                if (imgHeight > maxHeight) { imgWidth *= maxHeight / imgHeight; imgHeight = maxHeight; }
-                const pageW = doc.internal.pageSize.getWidth();
-                const imgX = (pageW - imgWidth) / 2;
-                
-                try { doc.addImage(this, 'JPEG', imgX, 10, imgWidth, imgHeight); } catch(e) { img.onerror(); return; }
-                generatePDFContent(doc, date, leader, title, freeTextContent, imgHeight + 30);
-            };
-            
-            img.onerror = function() {
-                generatePDFContent(doc, date, leader, title, freeTextContent, 15);
-            };
-            
-            if (customLogoDataUrl) {
-                img.src = customLogoDataUrl;
-            } else {
-                img.onerror();
-                return;
-            }
-        }
-
-        function generatePDFContent(doc, date, leader, title, freeTextContent, startY) {
-            let y = startY;
-            
-            const tableX = 10;
-            const tableW = 280;
-            
-            doc.setTextColor(0, 100, 200);
-            doc.setFontSize(21);
-            doc.text(title, tableX, y);
-            
-            doc.setFontSize(12);
-            doc.text(date, tableX, y + 8);
-            
-            const leaderTxt = `Tävlingsledare: ${leader}`;
-            const leaderW = doc.getTextWidth(leaderTxt);
-            doc.text(leaderTxt, tableX + tableW - leaderW, y + 8);
-            
-            y += 20;
-            
-            // Gruppera resultat efter Bana + Grupp
-            const groups = {};
-            const rows = document.getElementById('resultsBody').rows;
-            for (let row of rows) {
-                const name = row.querySelector('.name').value.trim();
-                if (name) {
-                    const course = row.querySelector('.course').value || '-';
-                    const group = row.querySelector('.group').value || 'Ingen grupp';
-                    const groupKey = `${course}_${group}`;
-                    if (!groups[groupKey]) groups[groupKey] = [];
-                    
-                    const weapon = row.querySelector('.weapon').value;
-                    const time = row.querySelector('.time').value;
-                    const stations = Array.from(row.querySelectorAll('.station')).map(input => input.value);
-                    const misses = row.querySelector('.missar').textContent;
-                    const penalty = row.querySelector('.penalty').textContent;
-                    const total = parseFloat(row.querySelector('.total').textContent);
-                    
-                    groups[groupKey].push({
-                        name, course, group, weapon, time, stations, misses, penalty, total
-                    });
-                }
-            }
-            
-            // Sortera inom grupper
-            Object.keys(groups).forEach(group => {
-                groups[group].sort((a, b) => a.total - b.total);
-            });
-            
-            // Räkna skyttar för radavstånd
-            const totalShooters = Object.values(groups).reduce((sum, g) => sum + g.length, 0);
-            const rowSpacing = totalShooters < 15 ? 7.5 : 5;
-            const rectHeight = totalShooters < 15 ? 7.5 : 5;
-            
-            doc.setTextColor(0, 0, 0);
-            doc.setLineWidth(0.5);
-            
-            // Rita tabell
-            doc.setFontSize(9);
-            const colPos = {
-                place: tableX + 2,
-                name: tableX + 12,
-                weapon: tableX + 75,
-                time: tableX + 95,
-                st1: tableX + 110,
-                st2: tableX + 120,
-                st3: tableX + 130,
-                st4: tableX + 140,
-                st5: tableX + 150,
-                st6: tableX + 160,
-                miss: tableX + 170,
-                penalty: tableX + 180,
-                total: tableX + 270
-            };
-            
-            doc.line(tableX, y - 5, tableX + tableW, y - 5);
-            doc.text('Pl.', colPos.place, y);
-            doc.text('Namn', colPos.name, y);
-            doc.text('Vapen', colPos.weapon, y);
-            doc.text('Löptid', colPos.time, y);
-            doc.text('Stationer', colPos.st1 + 20, y);
-            doc.text('Miss', colPos.miss, y);
-            doc.text('Straff', colPos.penalty, y);
-            doc.text('Total', colPos.total, y);
-            
-            doc.line(tableX, y + 3, tableX + tableW, y + 3);
-            y += 8;
-            
-            doc.setFontSize(8);
-            for (let i = 1; i <= 6; i++) {
-                doc.text(i.toString(), colPos.st1 + (i-1) * 10, y);
-            }
-            
-            doc.line(tableX, y + 3, tableX + tableW, y + 3);
-            y += 10;
-            
-            const sortedGroups = Object.keys(groups).sort();
-            sortedGroups.forEach((groupKey, groupIndex) => {
-                const groupResults = groups[groupKey];
-                
-                if (groupIndex > 0) y += 5;
-                
-                // Skriv gruppheader (Bana + Grupp)
-                if (y > 170) {
-                    doc.addPage('landscape');
-                    y = 20;
-                }
-                const [course, group] = groupKey.split('_');
-                const groupHeader = `Bana ${course} - ${group}`;
-                doc.setFontSize(11);
-                doc.setFont('helvetica', 'bold');
-                doc.text(groupHeader, tableX, y);
-                doc.setFont('helvetica', 'normal');
-                y += 6;
-                
-                groupResults.forEach((result, index) => {
-                    if (y > 175) {
-                        doc.addPage('landscape');
-                        y = 20;
-                    }
-                    
-                    if (index % 2 === 1) {
-                        doc.setFillColor(245, 245, 245);
-                        doc.rect(tableX, y - 4, tableW, rectHeight, 'F');
-                    }
-                    
-                    doc.setFontSize(12);
-                    doc.text((index + 1).toString(), colPos.place, y);
-                    doc.text(result.name, colPos.name, y);
-                    doc.text(result.weapon, colPos.weapon, y);
-                    doc.text(result.time, colPos.time, y);
-                    
-                    result.stations.forEach((hits, i) => {
-                        doc.text(hits, colPos.st1 + i * 10, y);
-                    });
-                    
-                    doc.text(result.misses, colPos.miss, y);
-                    doc.text(result.penalty, colPos.penalty, y);
-                    
-                    doc.setFont('helvetica', 'bold');
-                    doc.text(result.total.toFixed(2), colPos.total, y);
-                    doc.setFont('helvetica', 'normal');
-                    
-                    y += rowSpacing;
-                });
-            });
-            
-            doc.line(tableX, y - 2, tableX + tableW, y - 2);
-            
-            // Fritextfält
-            if (freeTextContent) {
-                y += 15;
-                doc.setFontSize(10);
-                
-                const maxWidth = 250;
-                const textLines = freeTextContent.split('\n');
-                
-                textLines.forEach(line => {
-                    let currentText = line.trim();
-                    
-                    if (!currentText) {
-                        y += 12;
-                        return;
-                    }
-                    
-                    if (y > 170) {
-                        doc.addPage('landscape');
-                        y = 20;
-                    }
-                    
-                    let cleanText = currentText
-                        .replace(/\*\*(.*?)\*\*/g, '$1')
-                        .replace(/\*(.*?)\*/g, '$1')
-                        .replace(/_(.*?)_/g, '$1');
-                    
-                    doc.setFont('helvetica', 'normal');
-                    const wrappedLines = doc.splitTextToSize(cleanText, maxWidth);
-                    
-                    wrappedLines.forEach(wrappedLine => {
-                        if (y > 170) {
-                            doc.addPage('landscape');
-                            y = 20;
-                        }
-                        doc.text(wrappedLine, tableX, y);
-                        y += 6;
-                    });
-                    
-                    y += 6;
-                });
-            }
-            
-            const filename = `${title.replace(/\s+/g, '_')}_${date}.pdf`;
-            doc.save(filename);
-        }
-
 
         function loadFile(event) {
             const file = event.target.files[0];
@@ -983,97 +446,245 @@
             };
             reader.readAsText(file);
         }
-        function submitResults() {
-            calculateAndSort(); saveCSV();
-            setTimeout(() => { skapaPDF(); }, 100);
-            document.getElementById('submitModal').style.display = 'block';
-            document.querySelector('.modal-backdrop').style.display = 'block';
-            const resultEmail = localStorage.getItem('resultEmail');
-            if (resultEmail) {
-                const competitionTitle = document.getElementById('competitionTitle').value;
-                const date = document.getElementById('date').value;
-                const emailSubject = encodeURIComponent(`Resultat ${competitionTitle} ${date}`);
-                const emailBody = encodeURIComponent('Hej!\n\nBifogat finns resultaten från dagens tävling i både CSV- och PDF-format.\n\nMvh');
-                setTimeout(() => { window.location.href = `mailto:${resultEmail}?subject=${emailSubject}&body=${emailBody}`; }, 500);
+
+        // === PDF generation ===
+
+        function skapaPDF() {
+            const { jsPDF } = window.jspdf;
+            if (!validateRowData()) {
+                return;
+            }
+
+            calculateAndSort();
+
+            const doc = new jsPDF('landscape');
+
+            const title = document.getElementById('competitionTitle').value || 'Springskytte';
+            const date = document.getElementById('date').value;
+            const leader = document.getElementById('leader').value;
+            const freeTextContent = document.getElementById('freeText').value.trim();
+
+            const img = new Image();
+            img.onload = function() {
+                const maxHeight = 60;
+                let imgWidth = 200;
+                let imgHeight = (this.height / this.width) * imgWidth;
+                if (imgHeight > maxHeight) { imgWidth *= maxHeight / imgHeight; imgHeight = maxHeight; }
+                const pageW = doc.internal.pageSize.getWidth();
+                const imgX = (pageW - imgWidth) / 2;
+
+                try { doc.addImage(this, 'JPEG', imgX, 10, imgWidth, imgHeight); } catch(e) { img.onerror(); return; }
+                generatePDFContent(doc, date, leader, title, freeTextContent, imgHeight + 30);
+            };
+
+            img.onerror = function() {
+                generatePDFContent(doc, date, leader, title, freeTextContent, 15);
+            };
+
+            if (customLogoDataUrl) {
+                img.src = customLogoDataUrl;
+            } else {
+                img.onerror();
+                return;
             }
         }
-        function closeModal() {
-            document.getElementById('submitModal').style.display = 'none';
-            document.querySelector('.modal-backdrop').style.display = 'none';
-        }
-        function insertText(text) {
-            const ta = document.getElementById('freeText'); const s = ta.selectionStart;
-            ta.value = ta.value.substring(0, s) + text + ta.value.substring(s);
-            ta.focus(); ta.setSelectionRange(s + text.length, s + text.length);
-        }
-        function clearText() { document.getElementById('freeText').value = ''; document.getElementById('freeText').focus(); }
 
-        addRow();
-        addRow();
-    
-        // === AUTOSAVE ===
-        const STORAGE_KEY = 'springskytte_autosave';
-        function autoSave() {
-            try {
-                const data = { title: document.getElementById('competitionTitle').value, date: document.getElementById('date').value, leader: document.getElementById('leader').value, freeText: document.getElementById('freeText').value, courseConfig: document.getElementById('courseConfig').value, rows: [] };
-                const tbody = document.getElementById('resultsBody');
-                Array.from(tbody.rows).forEach(row => {
-                    const rd = { _inputs: [] };
-                    row.querySelectorAll('input, select').forEach(el => { rd._inputs.push({ cls: el.className, val: el.value }); });
-                    data.rows.push(rd);
-                });
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-                const s = document.getElementById('saveStatus');
-                if (s) { s.classList.add('show'); setTimeout(() => s.classList.remove('show'), 1500); }
-            } catch(e) {}
-        }
-        function autoRestore() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (!saved) return false;
-                const data = JSON.parse(saved);
-                if (!data.rows || data.rows.length === 0) return false;
-                document.getElementById('competitionTitle').value = data.title || '';
-                document.getElementById('date').value = data.date || '';
-                document.getElementById('leader').value = data.leader || '';
-                document.getElementById('freeText').value = data.freeText || '';
-                if (data.courseConfig) document.getElementById('courseConfig').value = data.courseConfig;
-                const tbody = document.getElementById('resultsBody'); tbody.innerHTML = '';
-                data.rows.forEach(rd => {
-                    addRow();
-                    const row = tbody.lastElementChild;
-                    const inputs = row.querySelectorAll('input, select');
-                    if (rd._inputs) rd._inputs.forEach((s, i) => { if (inputs[i]) inputs[i].value = s.val; });
-                });
-                Array.from(tbody.rows).forEach(row => {
-                    if (typeof updateSpringTotals === 'function') updateSpringTotals(row);
-                    if (typeof updateTotals === 'function') updateTotals(row);
-                    if (typeof updateTotal === 'function') updateTotal(row);
-                });
-                return true;
-            } catch(e) { return false; }
-        }
-        function rensaAllt() {
-            if (!confirm('Vill du rensa alla resultat? Detta går inte att ångra.')) return;
-            localStorage.removeItem(STORAGE_KEY);
-            const tbody = document.getElementById('resultsBody'); tbody.innerHTML = '';
-            document.getElementById('competitionTitle').value = 'Springskytte';
-            document.getElementById('date').valueAsDate = new Date();
-            document.getElementById('leader').value = '';
-            document.getElementById('freeText').value = '';
-            addRow(); addRow();
-        }
-        document.addEventListener('input', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
-        document.addEventListener('change', () => { clearTimeout(window._st); window._st = setTimeout(autoSave, 500); });
-        setTimeout(() => {
-            autoRestore();
-            customLogoDataUrl = localStorage.getItem('customLogo') || null;
-            preloadMembers();
-            const leaderInput = document.getElementById('leader');
-            setupNameInputWithSuggestions(leaderInput, true);
-        }, 100);
+        function generatePDFContent(doc, date, leader, title, freeTextContent, startY) {
+            let y = startY;
 
+            const tableX = 10;
+            const tableW = 280;
+
+            doc.setTextColor(0, 100, 200);
+            doc.setFontSize(21);
+            doc.text(title, tableX, y);
+
+            doc.setFontSize(12);
+            doc.text(date, tableX, y + 8);
+
+            const leaderTxt = `Tävlingsledare: ${leader}`;
+            const leaderW = doc.getTextWidth(leaderTxt);
+            doc.text(leaderTxt, tableX + tableW - leaderW, y + 8);
+
+            y += 20;
+
+            // Gruppera resultat efter Bana + Grupp
+            const groups = {};
+            const rows = document.getElementById('resultsBody').rows;
+            for (let row of rows) {
+                const name = row.querySelector('.name').value.trim();
+                if (name) {
+                    const course = row.querySelector('.course').value || '-';
+                    const group = row.querySelector('.group').value || 'Ingen grupp';
+                    const groupKey = `${course}_${group}`;
+                    if (!groups[groupKey]) groups[groupKey] = [];
+
+                    const weapon = row.querySelector('.weapon').value;
+                    const time = row.querySelector('.time').value;
+                    const stations = Array.from(row.querySelectorAll('.station')).map(input => input.value);
+                    const misses = row.querySelector('.missar').textContent;
+                    const penalty = row.querySelector('.penalty').textContent;
+                    const total = parseFloat(row.querySelector('.total').textContent);
+
+                    groups[groupKey].push({
+                        name, course, group, weapon, time, stations, misses, penalty, total
+                    });
+                }
+            }
+
+            // Sortera inom grupper
+            Object.keys(groups).forEach(group => {
+                groups[group].sort((a, b) => a.total - b.total);
+            });
+
+            // Räkna skyttar för radavstånd
+            const totalShooters = Object.values(groups).reduce((sum, g) => sum + g.length, 0);
+            const rowSpacing = totalShooters < 15 ? 7.5 : 5;
+            const rectHeight = totalShooters < 15 ? 7.5 : 5;
+
+            doc.setTextColor(0, 0, 0);
+            doc.setLineWidth(0.5);
+
+            // Rita tabell
+            doc.setFontSize(9);
+            const colPos = {
+                place: tableX + 2,
+                name: tableX + 12,
+                weapon: tableX + 75,
+                time: tableX + 95,
+                st1: tableX + 110,
+                st2: tableX + 120,
+                st3: tableX + 130,
+                st4: tableX + 140,
+                st5: tableX + 150,
+                st6: tableX + 160,
+                miss: tableX + 170,
+                penalty: tableX + 180,
+                total: tableX + 270
+            };
+
+            doc.line(tableX, y - 5, tableX + tableW, y - 5);
+            doc.text('Pl.', colPos.place, y);
+            doc.text('Namn', colPos.name, y);
+            doc.text('Vapen', colPos.weapon, y);
+            doc.text('Löptid', colPos.time, y);
+            doc.text('Stationer', colPos.st1 + 20, y);
+            doc.text('Miss', colPos.miss, y);
+            doc.text('Straff', colPos.penalty, y);
+            doc.text('Total', colPos.total, y);
+
+            doc.line(tableX, y + 3, tableX + tableW, y + 3);
+            y += 8;
+
+            doc.setFontSize(8);
+            for (let i = 1; i <= 6; i++) {
+                doc.text(i.toString(), colPos.st1 + (i-1) * 10, y);
+            }
+
+            doc.line(tableX, y + 3, tableX + tableW, y + 3);
+            y += 10;
+
+            const sortedGroups = Object.keys(groups).sort();
+            sortedGroups.forEach((groupKey, groupIndex) => {
+                const groupResults = groups[groupKey];
+
+                if (groupIndex > 0) y += 5;
+
+                // Skriv gruppheader (Bana + Grupp)
+                if (y > 170) {
+                    doc.addPage('landscape');
+                    y = 20;
+                }
+                const [course, group] = groupKey.split('_');
+                const groupHeader = `Bana ${course} - ${group}`;
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text(groupHeader, tableX, y);
+                doc.setFont('helvetica', 'normal');
+                y += 6;
+
+                groupResults.forEach((result, index) => {
+                    if (y > 175) {
+                        doc.addPage('landscape');
+                        y = 20;
+                    }
+
+                    if (index % 2 === 1) {
+                        doc.setFillColor(245, 245, 245);
+                        doc.rect(tableX, y - 4, tableW, rectHeight, 'F');
+                    }
+
+                    doc.setFontSize(12);
+                    doc.text((index + 1).toString(), colPos.place, y);
+                    doc.text(result.name, colPos.name, y);
+                    doc.text(result.weapon, colPos.weapon, y);
+                    doc.text(result.time, colPos.time, y);
+
+                    result.stations.forEach((hits, i) => {
+                        doc.text(hits, colPos.st1 + i * 10, y);
+                    });
+
+                    doc.text(result.misses, colPos.miss, y);
+                    doc.text(result.penalty, colPos.penalty, y);
+
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(result.total.toFixed(2), colPos.total, y);
+                    doc.setFont('helvetica', 'normal');
+
+                    y += rowSpacing;
+                });
+            });
+
+            doc.line(tableX, y - 2, tableX + tableW, y - 2);
+
+            // Fritextfält
+            if (freeTextContent) {
+                y += 15;
+                doc.setFontSize(10);
+
+                const maxWidth = 250;
+                const textLines = freeTextContent.split('\n');
+
+                textLines.forEach(line => {
+                    let currentText = line.trim();
+
+                    if (!currentText) {
+                        y += 12;
+                        return;
+                    }
+
+                    if (y > 170) {
+                        doc.addPage('landscape');
+                        y = 20;
+                    }
+
+                    let cleanText = currentText
+                        .replace(/\*\*(.*?)\*\*/g, '$1')
+                        .replace(/\*(.*?)\*/g, '$1')
+                        .replace(/_(.*?)_/g, '$1');
+
+                    doc.setFont('helvetica', 'normal');
+                    const wrappedLines = doc.splitTextToSize(cleanText, maxWidth);
+
+                    wrappedLines.forEach(wrappedLine => {
+                        if (y > 170) {
+                            doc.addPage('landscape');
+                            y = 20;
+                        }
+                        doc.text(wrappedLine, tableX, y);
+                        y += 6;
+                    });
+
+                    y += 6;
+                });
+            }
+
+            const sanitizedTitle = title.replace(/[^a-zA-Z0-9åäöÅÄÖ]/g, '_');
+            const filename = `${sanitizedTitle}_${date}.pdf`;
+            doc.save(filename);
+        }
     </script>
     <div class="autosave-status" id="saveStatus">Sparad</div>
+    <div class="validation-warning" id="validationWarning"></div>
 </body>
 </html>
