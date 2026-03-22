@@ -431,6 +431,37 @@ function closeModal() {
     document.querySelector('.modal-backdrop').style.display = 'none';
 }
 
+// === Member list auto-update ===
+
+function updateMembersList() {
+    try {
+        const tbody = document.getElementById('resultsBody');
+        if (!tbody) return;
+        const names = [];
+        tbody.querySelectorAll('.name').forEach(input => {
+            const name = input.value.trim();
+            if (name) names.push(name);
+        });
+        if (names.length === 0) return;
+
+        const saved = localStorage.getItem('membersList');
+        const existing = saved ? JSON.parse(saved) : [];
+        const existingLower = existing.map(n => n.toLowerCase());
+        let added = 0;
+        names.forEach(name => {
+            if (!existingLower.includes(name.toLowerCase())) {
+                existing.push(name);
+                existingLower.push(name.toLowerCase());
+                added++;
+            }
+        });
+        if (added > 0) {
+            localStorage.setItem('membersList', JSON.stringify(existing));
+            preloadMembers();
+        }
+    } catch(e) { console.warn('updateMembersList failed:', e); }
+}
+
 // === Submit results ===
 
 function submitResults() {
@@ -438,6 +469,7 @@ function submitResults() {
         return;
     }
 
+    updateMembersList();
     calculateAndSort();
     if (typeof saveToFile === 'function') saveToFile();
     else if (typeof saveCSV === 'function') saveCSV();
