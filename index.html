@@ -476,6 +476,14 @@
                         </div>
                         <div class="setting-status" id="membersStatus"></div>
                     </div>
+                    <div id="memberEditor" style="display:none; margin-top: 12px;">
+                        <textarea id="memberEditArea" style="width:100%; height:300px; padding:10px; border:1px solid #d0d5dd; border-radius:8px; font-family:inherit; font-size:13px; resize:vertical;"></textarea>
+                        <div style="display:flex; gap:8px; margin-top:8px;">
+                            <button class="btn-action" onclick="saveMemberEdit()">Spara</button>
+                            <button class="btn-action-clear-sm" onclick="closeMemberEdit()">Avbryt</button>
+                        </div>
+                    </div>
+                    <button class="btn-action" onclick="openMemberEdit()" style="margin-top:8px;" id="memberEditBtn">Redigera lista</button>
                 </div>
             </div>
         </div>`;
@@ -578,6 +586,41 @@
             localStorage.removeItem('membersList');
             const el = document.getElementById('membersStatus');
             if (el) el.textContent = 'Medlemslistan rensad';
+            closeMemberEdit();
+        }
+
+        function openMemberEdit() {
+            const saved = localStorage.getItem('membersList');
+            const members = saved ? JSON.parse(saved) : [];
+            const area = document.getElementById('memberEditArea');
+            if (area) area.value = members.join('\n');
+            const editor = document.getElementById('memberEditor');
+            if (editor) editor.style.display = 'block';
+            const btn = document.getElementById('memberEditBtn');
+            if (btn) btn.style.display = 'none';
+        }
+
+        function closeMemberEdit() {
+            const editor = document.getElementById('memberEditor');
+            if (editor) editor.style.display = 'none';
+            const btn = document.getElementById('memberEditBtn');
+            if (btn) btn.style.display = '';
+        }
+
+        function saveMemberEdit() {
+            const area = document.getElementById('memberEditArea');
+            if (!area) return;
+            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const seen = new Set();
+            const unique = [];
+            lines.forEach(l => {
+                const key = l.toLowerCase();
+                if (!seen.has(key)) { seen.add(key); unique.push(l); }
+            });
+            localStorage.setItem('membersList', JSON.stringify(unique));
+            const el = document.getElementById('membersStatus');
+            if (el) el.textContent = unique.length + ' medlemmar sparade';
+            closeMemberEdit();
         }
 
         function restoreHomeState() {
