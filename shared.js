@@ -42,7 +42,16 @@ function preloadMembers() {
         const saved = localStorage.getItem('membersList');
         if (saved) {
             const lines = JSON.parse(saved);
-            preloadedMembers = lines.map(name => capitalizeName(name));
+            const seen = new Set();
+            preloadedMembers = [];
+            lines.forEach(name => {
+                const normalized = capitalizeName(name);
+                const key = normalized.toLowerCase();
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    preloadedMembers.push(normalized);
+                }
+            });
         }
     } catch(e) { console.warn('preloadMembers failed:', e); }
 }

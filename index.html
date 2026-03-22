@@ -542,9 +542,15 @@
             reader.onload = function(e) {
                 const text = e.target.result;
                 const content = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
-                const lines = content.split(/\r?\n/)
+                const rawLines = content.split(/\r?\n/)
                     .map(l => l.replace(/[;,\t]+/g, ' ').replace(/\s+/g, ' ').trim())
                     .filter(l => l.length > 0);
+                const seen = new Set();
+                const lines = [];
+                rawLines.forEach(l => {
+                    const key = l.toLowerCase();
+                    if (!seen.has(key)) { seen.add(key); lines.push(l); }
+                });
                 localStorage.setItem('membersList', JSON.stringify(lines));
                 const el = document.getElementById('membersStatus');
                 if (el) el.textContent = lines.length + ' medlemmar laddade';
