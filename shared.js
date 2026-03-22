@@ -68,7 +68,6 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
 
         const query = this.value.toLowerCase().trim();
         currentHighlightIndex = -1;
-        console.log('[autocomplete] query:', JSON.stringify(query), 'members:', preloadedMembers.length);
 
         if (query.length === 0 || preloadedMembers.length === 0) {
             hideDropdown();
@@ -83,7 +82,6 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
         );
 
         const allMatches = [...exactMatches, ...partialMatches];
-        console.log('[autocomplete] exact:', exactMatches.length, 'partial:', partialMatches.length, 'matches:', allMatches.map(m => m.substring(0, 30)));
 
         if (allMatches.length === 0) {
             hideDropdown();
@@ -464,6 +462,7 @@ function submitResults() {
 // === PDF helpers ===
 
 function addPageNumbers(doc) {
+    updateMembersList();
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
