@@ -445,8 +445,21 @@
                 <div class="section-box">
                     <h4>Medlemslista</h4>
                     <p>Ladda en CSV- eller textfil med medlemsnamn för automatiska namnförslag när du fyller i resultat. Börja skriva ett namn så visas matchande förslag.</p>
-                    <p><strong>Format:</strong> En fil med ett namn per rad, t.ex.:</p>
-                    <pre>Anna Andersson\nBjörn Björkman\nCecilia Carlsson</pre>
+                    <p><strong>Format:</strong> Ett namn per rad. Förnamn och efternamn kan separeras med mellanslag, semikolon, komma eller tab.</p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0;">
+                        <div style="flex: 1; min-width: 150px;">
+                            <p style="font-size: 11px; font-weight: 600; margin: 0 0 4px 0; color: #5a6778;">Mellanslag</p>
+                            <pre style="margin: 0;">Anna Andersson\nBjörn Björkman\nCecilia Carlsson</pre>
+                        </div>
+                        <div style="flex: 1; min-width: 150px;">
+                            <p style="font-size: 11px; font-weight: 600; margin: 0 0 4px 0; color: #5a6778;">Semikolon</p>
+                            <pre style="margin: 0;">Andersson;Anna\nBjörkman;Björn\nCarlsson;Cecilia</pre>
+                        </div>
+                        <div style="flex: 1; min-width: 150px;">
+                            <p style="font-size: 11px; font-weight: 600; margin: 0 0 4px 0; color: #5a6778;">Komma</p>
+                            <pre style="margin: 0;">Andersson,Anna\nBjörkman,Björn\nCarlsson,Cecilia</pre>
+                        </div>
+                    </div>
                     <p>Filen kan vara .csv eller .txt, med eller utan BOM. Tomma rader ignoreras.</p>
                     <div class="section-action">
                         <div class="input-row">
