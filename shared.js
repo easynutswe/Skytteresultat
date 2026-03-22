@@ -68,6 +68,7 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
 
         const query = this.value.toLowerCase().trim();
         currentHighlightIndex = -1;
+        console.log('[autocomplete] query:', JSON.stringify(query), 'members:', preloadedMembers.length);
 
         if (query.length === 0 || preloadedMembers.length === 0) {
             hideDropdown();
@@ -82,6 +83,7 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
         );
 
         const allMatches = [...exactMatches, ...partialMatches];
+        console.log('[autocomplete] exact:', exactMatches.length, 'partial:', partialMatches.length, 'matches:', allMatches.map(m => m.substring(0, 30)));
 
         if (allMatches.length === 0) {
             hideDropdown();
@@ -129,18 +131,34 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
             const item = document.createElement('div');
             item.className = 'suggestion-item';
             item.textContent = name;
-            item.addEventListener('click', () => selectSuggestion(name));
+            item.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                selectSuggestion(name);
+            });
             dropdown.appendChild(item);
         });
 
         dropdown.style.display = 'block';
 
         setTimeout(() => {
+            // Use offset position relative to container to avoid transform: scale issues
+            const containerRect = container.getBoundingClientRect();
             const inputRect = nameInput.getBoundingClientRect();
             const dropdownHeight = dropdown.offsetHeight;
-            dropdown.style.left = inputRect.left + 'px';
-            dropdown.style.width = inputRect.width + 'px';
-            dropdown.style.top = (inputRect.top - dropdownHeight - 5) + 'px';
+            // Scale factor from CSS transform
+            const computedStyle = getComputedStyle(nameInput);
+            const transform = computedStyle.transform;
+            let scale = 1;
+            if (transform && transform !== 'none') {
+                const match = transform.match(/matrix\(([^,]+)/);
+                if (match) scale = parseFloat(match[1]);
+            }
+            const realLeft = inputRect.left + (inputRect.width - inputRect.width / scale) / 2;
+            const realWidth = inputRect.width / scale;
+            const realTop = inputRect.top + (inputRect.height - inputRect.height / scale) / 2;
+            dropdown.style.left = realLeft + 'px';
+            dropdown.style.width = Math.max(realWidth, 200) + 'px';
+            dropdown.style.top = (realTop - dropdownHeight - 5) + 'px';
         }, 0);
     }
 
@@ -483,7 +501,6 @@ function autoSave() {
         });
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        updateMembersList();
         hasUnsavedChanges = false;
         const s = document.getElementById('saveStatus');
         if (s) { s.classList.add('show'); setTimeout(() => s.classList.remove('show'), 1500); }
