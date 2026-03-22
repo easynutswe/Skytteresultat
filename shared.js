@@ -58,18 +58,12 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
     }
 
     let currentHighlightIndex = -1;
-    let isAutoCompleting = false;
-    let wasAutoCompleted = false;
-    let originalAutoCompletedValue = '';
+    let skipNextInput = false;
 
     nameInput.addEventListener('input', function() {
-        if (isAutoCompleting) {
-            isAutoCompleting = false;
+        if (skipNextInput) {
+            skipNextInput = false;
             return;
-        }
-
-        if (wasAutoCompleted && this.value !== originalAutoCompletedValue) {
-            wasAutoCompleted = false; originalAutoCompletedValue = '';
         }
 
         const query = this.value.toLowerCase().trim();
@@ -91,29 +85,6 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
 
         if (allMatches.length === 0) {
             hideDropdown();
-            return;
-        }
-
-        if (allMatches.length === 1 && exactMatches.length === 1 && exactMatches[0].toLowerCase() === query) {
-            // Only auto-complete if query matches the full name exactly
-            isAutoCompleting = true;
-            wasAutoCompleted = true;
-            originalAutoCompletedValue = allMatches[0];
-
-            const currentValue = allMatches[0];
-            setTimeout(() => {
-                this.value = currentValue;
-                hideDropdown();
-
-                if (isLeaderField) {
-                    const freeTextArea = document.getElementById('freeText');
-                    if (freeTextArea) freeTextArea.focus();
-                } else {
-                    const row = this.closest('tr');
-                    const groupSelect = row ? row.querySelector('.group') : null;
-                    if (groupSelect) groupSelect.focus();
-                }
-            }, 100);
             return;
         }
 
@@ -149,11 +120,6 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
 
     nameInput.addEventListener('focus', function() {
         this.select();
-        if (this.value === '') {
-            isAutoCompleting = false;
-            wasAutoCompleted = false;
-            originalAutoCompletedValue = '';
-        }
     });
 
     function showSuggestions(matches) {
@@ -191,9 +157,7 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
     }
 
     function selectSuggestion(name) {
-        isAutoCompleting = true;
-        wasAutoCompleted = true;
-        originalAutoCompletedValue = name;
+        skipNextInput = true;
         nameInput.value = name;
         hideDropdown();
         nameInput.dispatchEvent(new Event('change'));
@@ -222,18 +186,12 @@ function setupWeaponInputWithSuggestions(weaponInput) {
     }
 
     let currentHighlightIndex = -1;
-    let isAutoCompleting = false;
-    let wasAutoCompleted = false;
-    let originalAutoCompletedValue = '';
+    let skipNextInput = false;
 
     weaponInput.addEventListener('input', function() {
-        if (isAutoCompleting) {
-            isAutoCompleting = false;
+        if (skipNextInput) {
+            skipNextInput = false;
             return;
-        }
-
-        if (wasAutoCompleted && this.value !== originalAutoCompletedValue) {
-            wasAutoCompleted = false; originalAutoCompletedValue = '';
         }
 
         const query = this.value.trim();
@@ -265,9 +223,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
         }
 
         if (allMatches.length === 1 && exactMatches.length === 1 && exactMatches[0].toLowerCase() === query.toLowerCase()) {
-            isAutoCompleting = true;
-            wasAutoCompleted = true;
-            originalAutoCompletedValue = allMatches[0];
+            skipNextInput = true;
             this.value = allMatches[0];
             hideDropdown();
 
@@ -279,7 +235,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
             return;
         }
 
-        showSuggestions(allMatches.slice(0, 6));
+        showSuggestions(allMatches.slice(0, 8));
     });
 
     weaponInput.addEventListener('keydown', function(e) {
@@ -316,9 +272,6 @@ function setupWeaponInputWithSuggestions(weaponInput) {
 
     weaponInput.addEventListener('focus', function() {
         if (this.value === '') {
-            isAutoCompleting = false;
-            wasAutoCompleted = false;
-            originalAutoCompletedValue = '';
         }
     });
 
@@ -357,9 +310,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
     }
 
     function selectSuggestion(weapon) {
-        isAutoCompleting = true;
-        wasAutoCompleted = true;
-        originalAutoCompletedValue = weapon;
+        skipNextInput = true;
         weaponInput.value = weapon;
         hideDropdown();
         weaponInput.dispatchEvent(new Event('change'));
@@ -532,6 +483,7 @@ function autoSave() {
         });
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        updateMembersList();
         hasUnsavedChanges = false;
         const s = document.getElementById('saveStatus');
         if (s) { s.classList.add('show'); setTimeout(() => s.classList.remove('show'), 1500); }
