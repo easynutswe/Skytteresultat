@@ -524,7 +524,13 @@
             reader.onload = function(e) {
                 const text = e.target.result;
                 const content = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
-                const lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+                const rawLines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+                const lines = [];
+                rawLines.forEach(line => {
+                    if (line.includes(';')) lines.push(...line.split(';').map(n => n.trim()).filter(n => n.length > 0));
+                    else if (line.includes(',')) lines.push(...line.split(',').map(n => n.trim()).filter(n => n.length > 0));
+                    else lines.push(line);
+                });
                 localStorage.setItem('membersList', JSON.stringify(lines));
                 const el = document.getElementById('membersStatus');
                 if (el) el.textContent = lines.length + ' medlemmar laddade';
