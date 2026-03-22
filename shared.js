@@ -88,6 +88,24 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
             return;
         }
 
+        // Auto-complete when one match left AND query has a space (started typing surname)
+        if (allMatches.length === 1 && query.includes(' ')) {
+            skipNextInput = true;
+            nameInput.value = allMatches[0];
+            hideDropdown();
+            setTimeout(() => {
+                if (isLeaderField) {
+                    const freeTextArea = document.getElementById('freeText');
+                    if (freeTextArea) freeTextArea.focus();
+                } else {
+                    const row = nameInput.closest('tr');
+                    const groupSelect = row ? row.querySelector('.group') : null;
+                    if (groupSelect) groupSelect.focus();
+                }
+            }, 100);
+            return;
+        }
+
         showSuggestions(allMatches.slice(0, 8));
     });
 
