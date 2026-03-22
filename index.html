@@ -628,6 +628,7 @@
             if (members && membersEl) {
                 try {
                     const list = JSON.parse(members);
+                    list.sort((a, b) => a.localeCompare(b, 'sv'));
                     membersEl.textContent = list.length + ' medlemmar laddade';
                     const area = document.getElementById('memberEditArea');
                     if (area) {
