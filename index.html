@@ -574,9 +574,10 @@
         }
 
         function clearMembers() {
+            if (!confirm('Vill du rensa hela medlemslistan? Detta går inte att ångra.')) return;
             localStorage.removeItem('membersList');
             const el = document.getElementById('membersStatus');
-            if (el) el.textContent = '';
+            if (el) el.textContent = 'Medlemslistan rensad';
         }
 
         function restoreHomeState() {
