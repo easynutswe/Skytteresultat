@@ -93,16 +93,14 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
             skipNextInput = true;
             nameInput.value = allMatches[0];
             hideDropdown();
-            setTimeout(() => {
-                if (isLeaderField) {
-                    const freeTextArea = document.getElementById('freeText');
-                    if (freeTextArea) freeTextArea.focus();
-                } else {
-                    const row = nameInput.closest('tr');
-                    const groupSelect = row ? row.querySelector('.group') : null;
-                    if (groupSelect) groupSelect.focus();
-                }
-            }, 100);
+            if (isLeaderField) {
+                const freeTextArea = document.getElementById('freeText');
+                if (freeTextArea) freeTextArea.focus();
+            } else {
+                const row = nameInput.closest('tr');
+                const groupSelect = row ? row.querySelector('.group') : null;
+                if (groupSelect) groupSelect.focus();
+            }
             return;
         }
 
