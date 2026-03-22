@@ -98,8 +98,8 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
             return;
         }
 
-        // Auto-complete when one match left AND query has a space (started typing surname)
-        if (allMatches.length === 1 && query.includes(' ')) {
+        // Auto-complete when only one match remains
+        if (allMatches.length === 1) {
             skipNextInput = true;
             nameInput.value = allMatches[0];
             hideDropdown();
