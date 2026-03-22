@@ -52,6 +52,7 @@ function preloadMembers() {
                     preloadedMembers.push(normalized);
                 }
             });
+            preloadedMembers.sort((a, b) => a.localeCompare(b, 'sv'));
         }
     } catch(e) { console.warn('preloadMembers failed:', e); }
 }
@@ -449,6 +450,7 @@ function updateMembersList() {
             }
         });
         if (added > 0) {
+            existing.sort((a, b) => a.localeCompare(b, 'sv'));
             localStorage.setItem('membersList', JSON.stringify(existing));
             preloadMembers();
         }

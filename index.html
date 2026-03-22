@@ -557,6 +557,7 @@
                     const key = l.toLowerCase();
                     if (!seen.has(key)) { seen.add(key); lines.push(l); }
                 });
+                lines.sort((a, b) => a.localeCompare(b, 'sv'));
                 localStorage.setItem('membersList', JSON.stringify(lines));
                 const el = document.getElementById('membersStatus');
                 if (el) el.textContent = lines.length + ' medlemmar laddade';
@@ -607,6 +608,7 @@
                 const key = l.toLowerCase();
                 if (!seen.has(key)) { seen.add(key); unique.push(l); }
             });
+            unique.sort((a, b) => a.localeCompare(b, 'sv'));
             localStorage.setItem('membersList', JSON.stringify(unique));
             area.value = unique.join('\n');
             autoResizeMemberArea();
