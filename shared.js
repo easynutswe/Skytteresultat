@@ -84,14 +84,21 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
             return;
         }
 
+        const queryWords = query.split(/\s+/).filter(w => w.length > 0);
         const exactMatches = preloadedMembers.filter(name =>
             name.toLowerCase().startsWith(query)
         );
         const partialMatches = preloadedMembers.filter(name =>
             name.toLowerCase().includes(query) && !name.toLowerCase().startsWith(query)
         );
+        // Word-order-independent: all query words must appear somewhere in the name
+        const wordMatches = queryWords.length > 1 ? preloadedMembers.filter(name => {
+            const nameLower = name.toLowerCase();
+            return queryWords.every(w => nameLower.includes(w)) &&
+                !nameLower.startsWith(query) && !nameLower.includes(query);
+        }) : [];
 
-        const allMatches = [...exactMatches, ...partialMatches];
+        const allMatches = [...exactMatches, ...partialMatches, ...wordMatches];
 
         if (allMatches.length === 0) {
             hideDropdown();
