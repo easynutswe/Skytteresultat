@@ -69,6 +69,7 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
 
     let currentHighlightIndex = -1;
     let skipNextInput = false;
+    let manualMode = false;
 
     nameInput.addEventListener('input', function() {
         if (skipNextInput) {
@@ -80,6 +81,7 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
         currentHighlightIndex = -1;
 
         if (query.length === 0 || preloadedMembers.length === 0) {
+            manualMode = false;
             hideDropdown();
             return;
         }
@@ -105,8 +107,8 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
             return;
         }
 
-        // Auto-complete when only one match remains
-        if (allMatches.length === 1) {
+        // Auto-complete when only one match remains (but not in manual edit mode)
+        if (allMatches.length === 1 && !manualMode) {
             skipNextInput = true;
             nameInput.value = allMatches[0];
             hideDropdown();
@@ -152,6 +154,8 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
     });
 
     nameInput.addEventListener('focus', function() {
+        // If field already has text, user is editing — enable manual mode
+        manualMode = this.value.trim().length > 0;
         this.select();
     });
 
@@ -207,6 +211,7 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
 
     function selectSuggestion(name) {
         skipNextInput = true;
+        manualMode = false;
         nameInput.value = name;
         hideDropdown();
         nameInput.dispatchEvent(new Event('change'));
@@ -236,6 +241,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
 
     let currentHighlightIndex = -1;
     let skipNextInput = false;
+    let manualMode = false;
 
     weaponInput.addEventListener('input', function() {
         if (skipNextInput) {
@@ -247,6 +253,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
         currentHighlightIndex = -1;
 
         if (query.length === 0) {
+            manualMode = false;
             hideDropdown();
             return;
         }
@@ -271,7 +278,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
             return;
         }
 
-        if (allMatches.length === 1 && exactMatches.length === 1 && exactMatches[0].toLowerCase() === query.toLowerCase()) {
+        if (!manualMode && allMatches.length === 1 && exactMatches.length === 1 && exactMatches[0].toLowerCase() === query.toLowerCase()) {
             skipNextInput = true;
             this.value = allMatches[0];
             hideDropdown();
@@ -320,8 +327,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
     });
 
     weaponInput.addEventListener('focus', function() {
-        if (this.value === '') {
-        }
+        manualMode = this.value.trim().length > 0;
     });
 
     function showSuggestions(matches) {
@@ -360,6 +366,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
 
     function selectSuggestion(weapon) {
         skipNextInput = true;
+        manualMode = false;
         weaponInput.value = weapon;
         hideDropdown();
         weaponInput.dispatchEvent(new Event('change'));
