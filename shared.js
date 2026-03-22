@@ -94,7 +94,8 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
             return;
         }
 
-        if (allMatches.length === 1 && exactMatches.length === 1) {
+        if (allMatches.length === 1 && exactMatches.length === 1 && exactMatches[0].toLowerCase() === query) {
+            // Only auto-complete if query matches the full name exactly
             isAutoCompleting = true;
             wasAutoCompleted = true;
             originalAutoCompletedValue = allMatches[0];
@@ -116,7 +117,7 @@ function setupNameInputWithSuggestions(nameInput, isLeaderField = false) {
             return;
         }
 
-        showSuggestions(allMatches.slice(0, 6));
+        showSuggestions(allMatches.slice(0, 8));
     });
 
     nameInput.addEventListener('keydown', function(e) {
