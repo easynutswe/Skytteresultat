@@ -471,6 +471,7 @@
                                 Ladda CSV
                                 <input type="file" accept=".csv,.txt" onchange="loadMembers(this)" style="display:none">
                             </label>
+                            <button class="btn-action" onclick="exportMembers()">Exportera CSV</button>
                             <button class="btn-action-clear-sm" onclick="clearMembers()">Rensa</button>
                         </div>
                         <div class="setting-status" id="membersStatus"></div>
@@ -549,6 +550,21 @@
                 if (el) el.textContent = lines.length + ' medlemmar laddade';
             };
             reader.readAsText(input.files[0]);
+        }
+
+        function exportMembers() {
+            const saved = localStorage.getItem('membersList');
+            if (!saved) { alert('Ingen medlemslista att exportera.'); return; }
+            const members = JSON.parse(saved);
+            if (members.length === 0) { alert('Medlemslistan är tom.'); return; }
+            const csv = '\uFEFF' + members.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'medlemslista.csv';
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
         function clearMembers() {
