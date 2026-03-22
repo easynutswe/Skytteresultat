@@ -633,6 +633,15 @@
 
                     y += rowSpacing;
                 });
+
+                const groupAvg = (groupResults.reduce((sum, r) => sum + r.total, 0) / groupResults.length).toFixed(2);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.setFillColor(230, 240, 230);
+                doc.rect(tableX, y - 4, tableW, rectHeight, 'F');
+                doc.text(`${groupResults.length} skyttar, snitt: ${groupAvg}s`, colPos.name, y);
+                doc.setFont('helvetica', 'normal');
+                y += rowSpacing + 2;
             });
 
             doc.line(tableX, y - 2, tableX + tableW, y - 2);
@@ -681,6 +690,7 @@
 
             const sanitizedTitle = title.replace(/[^a-zA-Z0-9åäöÅÄÖ]/g, '_');
             const filename = `${sanitizedTitle}_${date}.pdf`;
+            addPageNumbers(doc);
             doc.save(filename);
         }
     </script>

@@ -714,6 +714,17 @@
 
                     y += rowSpacing;
                 });
+
+                // Total row per group
+                const groupTotal = groupResults.reduce((sum, r) => sum + r.total, 0);
+                const groupAvg = (groupTotal / groupResults.length).toFixed(1);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.setFillColor(230, 240, 230);
+                doc.rect(tableX, y - 4, tableW, rectHeight, 'F');
+                doc.text(`${groupName} — ${groupResults.length} skyttar, snitt: ${groupAvg}`, colPos.name, y);
+                doc.setFont('helvetica', 'normal');
+                y += rowSpacing + 2;
             });
 
             doc.line(tableX, y - 2, tableX + tableW, y - 2);
@@ -759,6 +770,7 @@
                 });
             }
 
+            addPageNumbers(doc);
             const filename = `${title.replace(/\s+/g, '_')}_${date}.pdf`;
             doc.save(filename);
         }

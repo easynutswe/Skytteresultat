@@ -459,6 +459,19 @@ function submitResults() {
     }
 }
 
+// === PDF helpers ===
+
+function addPageNumbers(doc) {
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`Sida ${i} av ${pageCount}`, doc.internal.pageSize.getWidth() - 20, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+    }
+    doc.setTextColor(0, 0, 0);
+}
+
 // === Autosave ===
 
 let hasUnsavedChanges = false;
