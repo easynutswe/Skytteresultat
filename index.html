@@ -476,14 +476,12 @@
                         </div>
                         <div class="setting-status" id="membersStatus"></div>
                     </div>
-                    <div id="memberEditor" style="display:none; margin-top: 12px;">
-                        <textarea id="memberEditArea" style="width:100%; height:300px; padding:10px; border:1px solid #d0d5dd; border-radius:8px; font-family:inherit; font-size:13px; resize:vertical;"></textarea>
+                    <div id="memberEditor" style="margin-top: 12px;">
+                        <textarea id="memberEditArea" style="width:100%; padding:10px; border:1px solid #d0d5dd; border-radius:8px; font-family:inherit; font-size:13px; resize:none; overflow:hidden; line-height:1.4;" oninput="autoResizeMemberArea()"></textarea>
                         <div style="display:flex; gap:8px; margin-top:8px;">
-                            <button class="btn-action" onclick="saveMemberEdit()">Spara</button>
-                            <button class="btn-action-clear-sm" onclick="closeMemberEdit()">Avbryt</button>
+                            <button class="btn-action" onclick="saveMemberEdit()">Spara ändringar</button>
                         </div>
                     </div>
-                    <button class="btn-action" onclick="openMemberEdit()" style="margin-top:8px;" id="memberEditBtn">Redigera lista</button>
                 </div>
             </div>
         </div>`;
@@ -562,6 +560,8 @@
                 localStorage.setItem('membersList', JSON.stringify(lines));
                 const el = document.getElementById('membersStatus');
                 if (el) el.textContent = lines.length + ' medlemmar laddade';
+                const area = document.getElementById('memberEditArea');
+                if (area) { area.value = lines.join('\n'); autoResizeMemberArea(); }
             };
             reader.readAsText(input.files[0]);
         }
@@ -586,25 +586,15 @@
             localStorage.removeItem('membersList');
             const el = document.getElementById('membersStatus');
             if (el) el.textContent = 'Medlemslistan rensad';
-            closeMemberEdit();
-        }
-
-        function openMemberEdit() {
-            const saved = localStorage.getItem('membersList');
-            const members = saved ? JSON.parse(saved) : [];
             const area = document.getElementById('memberEditArea');
-            if (area) area.value = members.join('\n');
-            const editor = document.getElementById('memberEditor');
-            if (editor) editor.style.display = 'block';
-            const btn = document.getElementById('memberEditBtn');
-            if (btn) btn.style.display = 'none';
+            if (area) { area.value = ''; autoResizeMemberArea(); }
         }
 
-        function closeMemberEdit() {
-            const editor = document.getElementById('memberEditor');
-            if (editor) editor.style.display = 'none';
-            const btn = document.getElementById('memberEditBtn');
-            if (btn) btn.style.display = '';
+        function autoResizeMemberArea() {
+            const area = document.getElementById('memberEditArea');
+            if (!area) return;
+            area.style.height = 'auto';
+            area.style.height = Math.max(60, area.scrollHeight) + 'px';
         }
 
         function saveMemberEdit() {
@@ -618,9 +608,10 @@
                 if (!seen.has(key)) { seen.add(key); unique.push(l); }
             });
             localStorage.setItem('membersList', JSON.stringify(unique));
+            area.value = unique.join('\n');
+            autoResizeMemberArea();
             const el = document.getElementById('membersStatus');
             if (el) el.textContent = unique.length + ' medlemmar sparade';
-            closeMemberEdit();
         }
 
         function restoreHomeState() {
@@ -636,6 +627,11 @@
                 try {
                     const list = JSON.parse(members);
                     membersEl.textContent = list.length + ' medlemmar laddade';
+                    const area = document.getElementById('memberEditArea');
+                    if (area) {
+                        area.value = list.join('\n');
+                        autoResizeMemberArea();
+                    }
                 } catch(e) {}
             }
 
