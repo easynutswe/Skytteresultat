@@ -313,10 +313,12 @@ function setupWeaponInputWithSuggestions(weaponInput) {
         } else if (e.key === 'Escape') {
             hideDropdown();
         } else if (e.key === 'Tab') {
-            const query = this.value.trim();
-            if (query.length > 0 && suggestionItems.length > 0) {
-                e.preventDefault();
-                selectSuggestion(suggestionItems[0].textContent);
+            if (!manualMode) {
+                const query = this.value.trim();
+                if (query.length > 0 && suggestionItems.length > 0) {
+                    e.preventDefault();
+                    selectSuggestion(suggestionItems[0].textContent);
+                }
             }
             hideDropdown();
         }
