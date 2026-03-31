@@ -328,6 +328,7 @@ function setupWeaponInputWithSuggestions(weaponInput) {
 
     weaponInput.addEventListener('focus', function() {
         manualMode = this.value.trim().length > 0;
+        this.select();
     });
 
     function showSuggestions(matches) {
